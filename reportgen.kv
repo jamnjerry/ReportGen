@@ -1,0 +1,26 @@
+ScreenManager:
+    MainScreen:
+    CourseScreen:
+
+<MainScreen>:
+    name: 'main'
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        id: box_main
+        MDTopAppBar:
+            title: "ReportGen"
+            md_bg_color: app.theme_cls.primary_color
+            left_action_items: [["menu", lambda x: None]]
+            right_action_items: [["plus", lambda x: app.switch_to_add_item_screen()]]
+<CourseScreen>
+    name: 'course'
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        id: box_main
+        MDTopAppBar:
+            title: "ReportGen"
+            md_bg_color: app.theme_cls.primary_color
+            left_action_items: [["menu", lambda x: None]]
+            right_action_items: [["plus", lambda x: app.switch_to_add_item_screen()]]
