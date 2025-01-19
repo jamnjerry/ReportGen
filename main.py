@@ -31,12 +31,16 @@ class ReportGen(MDApp):
         self.inventory = []  # List to hold inventory data
         self.theme_cls.primary_palette = "Cyan"
         self.sm = Builder.load_file('reportgen.kv')
-        self.data_table = self.create_data_table()
+        self.data_table = self.create_data_table([
+                ("ID", dp(30)),
+                ("Course Name", dp(70)),
+                ('Class ID', dp(30)),
+            ], [(item[0], item[1], item[-1]) for item in self.get_all_items('course', 'teacher', self.teacher)])
         self.data_table.bind(on_row_press=self.on_row_press)
         self.sm.get_screen('main').ids.box_main.add_widget(self.data_table)
         return self.sm
 
-    def create_data_table(self):
+    def create_data_table(self, column_data, row_data):
         """Create an MDDataTable widget."""
         return MDDataTable(
             size_hint=(1, 1),
@@ -45,15 +49,12 @@ class ReportGen(MDApp):
             elevation=0,
             background_color_header="yellow",
             rows_num=5,
-            column_data=[
-                ("ID", dp(50)),
-                ("Course Name", dp(200)),
-            ],
-            row_data= [(item[0], item[1]) for item in self.get_all_items()],
+            column_data=column_data,
+            row_data= row_data,
         )
 
-    def get_all_items(self):
-        cursor.execute(f"SELECT * FROM course WHERE teacher={self.teacher}")
+    def get_all_items(self, table, cond, val):
+        cursor.execute(f"SELECT * FROM {table} WHERE {cond}={val}")
         return cursor.fetchall()
 
     def switch_to_add_item_screen(self):
@@ -95,7 +96,15 @@ class ReportGen(MDApp):
         dialog.open()
     
     def on_row_press(self, instance_table, instance_row):
-        print('course')
+        row_num = int(instance_row.index/len(instance_table.column_data))
+        row_data = instance_table.row_data[row_num]
+        self.screen = self.sm.current_screen
+        if self.screen.name == 'main':
+            col_input = [('ID', dp(30)), ('Name', dp(70))]
+            row_input = [(item[0], item[1] + ' ' + item[2]) for item in self.get_all_items('student', 'class', row_data[-1])]
+            self.sm.get_screen('course').ids.box_course.add_widget(self.create_data_table(col_input,row_input))
+            self.sm.current = 'course'
+        print (row_data[0])
 
 if __name__ == "__main__":
     ReportGen().run()
