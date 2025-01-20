@@ -6,6 +6,8 @@ from kivymd.uix.datatables import MDDataTable
 from kivy.metrics import dp
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.button import MDRaisedButton
+from kivymd.uix.floatlayout import MDFloatLayout
+from kivy.uix.textinput import TextInput
 import mysql.connector as connector
 from datetime import datetime
 
@@ -25,6 +27,9 @@ class MainScreen(Screen):
 class CourseScreen(Screen):
     pass
 
+class Grades(Screen):
+    pass
+
 class ReportGen(MDApp):
     teacher = 1
     def build(self):
@@ -36,13 +41,12 @@ class ReportGen(MDApp):
                 ("Course Name", dp(70)),
                 ('Class ID', dp(30)),
             ], [(item[0], item[1], item[-1]) for item in self.get_all_items('course', 'teacher', self.teacher)])
-        self.data_table.bind(on_row_press=self.on_row_press)
         self.sm.get_screen('main').ids.box_main.add_widget(self.data_table)
         return self.sm
 
     def create_data_table(self, column_data, row_data):
         """Create an MDDataTable widget."""
-        return MDDataTable(
+        table = MDDataTable(
             size_hint=(1, 1),
             check=True,
             use_pagination=True,
@@ -52,6 +56,8 @@ class ReportGen(MDApp):
             column_data=column_data,
             row_data= row_data,
         )
+        table.bind(on_row_press=self.on_row_press)
+        return table
 
     def get_all_items(self, table, cond, val):
         cursor.execute(f"SELECT * FROM {table} WHERE {cond}={val}")
@@ -104,6 +110,27 @@ class ReportGen(MDApp):
             row_input = [(item[0], item[1] + ' ' + item[2]) for item in self.get_all_items('student', 'class', row_data[-1])]
             self.sm.get_screen('course').ids.box_course.add_widget(self.create_data_table(col_input,row_input))
             self.sm.current = 'course'
+        elif self.screen.name == 'course':
+            # grades = MDFloatLayout()
+            # percent = TextInput(width=100, height=100)
+            # percent.hint_text = '%'
+            # grades.add_widget(percent)
+            dialog = MDDialog(
+            title=self.name,
+            type="custom",
+            content_cls=Grades(),
+            buttons=[
+                MDRaisedButton(
+                    text="Submit",
+                    on_release=lambda x: dialog.dismiss()
+                ),
+                MDRaisedButton(
+                    text="CLOSE",
+                    on_release=lambda x: dialog.dismiss()
+                ),
+                ],
+            )
+            dialog.open()
         print (row_data[0])
 
 if __name__ == "__main__":
