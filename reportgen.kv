@@ -30,12 +30,31 @@ ScreenManager:
 
     MDGridLayout:
         id: box_grades
+        cols: 3
         TextInput:
-            id: grade
+            id: term1
             size_hint: (None, None)
             width: 200
             height: 200
             font_size: "30sp"
             pos_hint: {"center_x": 0.5, "center_y": 0.5}
             multiline: False
-            hint_text: 'Input %'
+            hint_text: 'Term 1 %'
+        TextInput:
+            id: term2
+            size_hint: (None, None)
+            width: 200
+            height: 200
+            font_size: "30sp"
+            pos_hint: {"center_x": 0.5, "center_y": 0.5}
+            multiline: False
+            hint_text: 'Term 2 %'
+        TextInput:
+            id: term3
+            size_hint: (None, None)
+            width: 200
+            height: 200
+            font_size: "30sp"
+            pos_hint: {"center_x": 0.5, "center_y": 0.5}
+            multiline: False
+            hint_text: 'Term 3 %'

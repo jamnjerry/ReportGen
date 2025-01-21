@@ -62,6 +62,9 @@ class ReportGen(MDApp):
     def get_all_items(self, table, cond, val):
         cursor.execute(f"SELECT * FROM {table} WHERE {cond}={val}")
         return cursor.fetchall()
+    def get_all_items_cond(self, table, cond1, val1, cond2, val2):
+        cursor.execute(f"SELECT * FROM {table} WHERE {cond1}= '{val1}' AND {cond2}='{val2}'")
+        return cursor.fetchall()
 
     def switch_to_add_item_screen(self):
         """Switch to the Add Item screen."""
@@ -86,6 +89,9 @@ class ReportGen(MDApp):
         """Update the MDDataTable with the latest inventory data."""
         self.inventory = self.get_all_items()
         self.data_table.row_data = [(i + 1, item[1], item[2]) for i, item in enumerate(self.inventory)]
+    
+    def update_grade(self):
+        pass
 
     def show_dialog(self, title, text):
         """Display an error dialog."""
@@ -106,15 +112,14 @@ class ReportGen(MDApp):
         row_data = instance_table.row_data[row_num]
         self.screen = self.sm.current_screen
         if self.screen.name == 'main':
-            col_input = [('ID', dp(30)), ('Name', dp(70))]
-            row_input = [(item[0], item[1] + ' ' + item[2]) for item in self.get_all_items('student', 'class', row_data[-1])]
+            col_input = [('ID', dp(30)), ('Name', dp(50)), ('T1', dp(20)), ('T2', dp(20)), ('T3', dp(20))]
+            details = self.get_all_items('student', 'class', row_data[-1])
+            grade = self.get_all_items_cond('grade', 'studentid', details[0][0], 'courseid', row_data[0])
+            
+            row_input = [(item[0], item[1] + ' ' + item[2], g[3], g[4], g[5]) for item, g in zip(details, grade) ]
             self.sm.get_screen('course').ids.box_course.add_widget(self.create_data_table(col_input,row_input))
             self.sm.current = 'course'
         elif self.screen.name == 'course':
-            # grades = MDFloatLayout()
-            # percent = TextInput(width=100, height=100)
-            # percent.hint_text = '%'
-            # grades.add_widget(percent)
             dialog = MDDialog(
             title=self.name,
             type="custom",
@@ -122,7 +127,7 @@ class ReportGen(MDApp):
             buttons=[
                 MDRaisedButton(
                     text="Submit",
-                    on_release=lambda x: dialog.dismiss()
+                    on_release=lambda x: self.update_grade()
                 ),
                 MDRaisedButton(
                     text="CLOSE",
