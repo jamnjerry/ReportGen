@@ -10,6 +10,8 @@ from kivymd.uix.floatlayout import MDFloatLayout
 from kivy.uix.textinput import TextInput
 import mysql.connector as connector
 from datetime import datetime
+from logging import ERROR
+from collections import deque
 
 conn = connector.connect(
     host="127.0.0.1",         # Replace with your MySQL server's hostname or IP address
@@ -41,7 +43,7 @@ class ReportGen(MDApp):
                 ("Course Name", dp(70)),
                 ('Class ID', dp(30)),
             ], [(item[0], item[1], item[-1]) for item in self.get_all_items('course', 'teacher', self.teacher)])
-        self.sm.get_screen('main').ids.box_main.add_widget(self.data_table)
+        self.sm.get_screen('main').ids.box_table.add_widget(self.data_table)
         return self.sm
 
     def create_data_table(self, column_data, row_data):
@@ -90,8 +92,29 @@ class ReportGen(MDApp):
         self.inventory = self.get_all_items()
         self.data_table.row_data = [(i + 1, item[1], item[2]) for i, item in enumerate(self.inventory)]
     
-    def update_grade(self):
-        pass
+    def update_grade(self, keys, studentid, courseid):
+        grade = [self.dialog.content_cls.ids.term1.text.strip(),
+                self.dialog.content_cls.ids.term2.text.strip(),
+                self.dialog.content_cls.ids.term3.text.strip(),
+    ]   
+        gradezip = zip(keys,grade)
+        for key, val in gradezip:
+            if val:
+                print(key, val)
+                cursor.execute(f'UPDATE grade SET {key}={val} WHERE studentid={studentid} AND courseid={courseid}')
+                conn.commit()
+                
+            else:
+                pass
+        col_input = [('ID', dp(30)), ('Name', dp(50)), ('T1', dp(20)), ('T2', dp(20)), ('T3', dp(20))]
+        details = self.get_all_items('student', 'class', self.clas)
+        grade = self.get_all_items_cond('grade', 'studentid', details[0][0], 'courseid', self.courseid)
+        row_input = [(item[0], item[1] + ' ' + item[2], g[3], g[4], g[5]) for item, g in zip(details, grade) ]
+        table = self.create_data_table(col_input,row_input)
+        self.sm.get_screen('course').ids.box_table.clear_widgets()
+        self.sm.get_screen('course').ids.box_table.add_widget(table)
+        self.dialog.dismiss()
+        
 
     def show_dialog(self, title, text):
         """Display an error dialog."""
@@ -110,32 +133,40 @@ class ReportGen(MDApp):
     def on_row_press(self, instance_table, instance_row):
         row_num = int(instance_row.index/len(instance_table.column_data))
         row_data = instance_table.row_data[row_num]
+        print('ROW', row_data)
         self.screen = self.sm.current_screen
         if self.screen.name == 'main':
             col_input = [('ID', dp(30)), ('Name', dp(50)), ('T1', dp(20)), ('T2', dp(20)), ('T3', dp(20))]
-            details = self.get_all_items('student', 'class', row_data[-1])
+            self.clas = row_data[-1]
+            details = self.get_all_items('student', 'class', self.clas)
             grade = self.get_all_items_cond('grade', 'studentid', details[0][0], 'courseid', row_data[0])
-            
+            self.courseid = row_data[0]
             row_input = [(item[0], item[1] + ' ' + item[2], g[3], g[4], g[5]) for item, g in zip(details, grade) ]
-            self.sm.get_screen('course').ids.box_course.add_widget(self.create_data_table(col_input,row_input))
+            self.sm.get_screen('course').ids.box_table.add_widget(self.create_data_table(col_input,row_input))
             self.sm.current = 'course'
         elif self.screen.name == 'course':
-            dialog = MDDialog(
+            details = self.get_all_items_cond('grade', 'studentid', row_data[0], 'courseid', self.courseid)
+            print(details)
+            studentid = details[0][1]
+            # gradedict.keys = self.sm.get_screen('grades').ids
+            keys = list(self.sm.get_screen('grades').ids.keys())
+            keys = [x for x in keys if keys.index(x) != 0]
+            self.dialog = MDDialog(
             title=self.name,
             type="custom",
             content_cls=Grades(),
             buttons=[
                 MDRaisedButton(
                     text="Submit",
-                    on_release=lambda x: self.update_grade()
+                    on_release=lambda x: self.update_grade(keys, studentid, self.courseid)
                 ),
                 MDRaisedButton(
                     text="CLOSE",
-                    on_release=lambda x: dialog.dismiss()
+                    on_release=lambda x: self.dialog.dismiss()
                 ),
                 ],
             )
-            dialog.open()
+            self.dialog.open()
         print (row_data[0])
 
 if __name__ == "__main__":

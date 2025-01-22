@@ -14,6 +14,8 @@ ScreenManager:
             md_bg_color: app.theme_cls.primary_color
             left_action_items: [["menu", lambda x: None]]
             right_action_items: [["plus", lambda x: app.switch_to_add_item_screen()]]
+        MDBoxLayout:
+            id: box_table
 <CourseScreen>
     name: 'course'
 
@@ -25,11 +27,14 @@ ScreenManager:
             md_bg_color: app.theme_cls.primary_color
             left_action_items: [["menu", lambda x: None]]
             right_action_items: [["plus", lambda x: app.switch_to_add_item_screen()]]
+        MDBoxLayout:
+            orientation: 'vertical'
+            id: box_table
 <Grades>
     name: 'grades'
 
     MDGridLayout:
-        id: box_grades
+        id: grid_grades
         cols: 3
         TextInput:
             id: term1
