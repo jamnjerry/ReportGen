@@ -107,9 +107,9 @@ class ReportGen(MDApp):
             else:
                 pass
         col_input = [('ID', dp(30)), ('Name', dp(50)), ('T1', dp(20)), ('T2', dp(20)), ('T3', dp(20))]
-        details = self.get_all_items('student', 'class', self.clas)
-        grade = self.get_all_items_cond('grade', 'studentid', details[0][0], 'courseid', self.courseid)
-        row_input = [(item[0], item[1] + ' ' + item[2], g[3], g[4], g[5]) for item, g in zip(details, grade) ]
+        cursor.execute(f'SELECT s.id, fname, lname, term1, term2, term3 from gradingrpa.student as s join gradingrpa.course as c on s.class = c.class join gradingrpa.grade as g on c.id = g.courseid WHERE g.courseid = {self.courseid} and s.class = {self.clas}')
+        grade = cursor.fetchall()
+        row_input = [(item[0], item[1] + ' ' + item[2], item[3], item[4], item[5]) for item in grade]
         table = self.create_data_table(col_input,row_input)
         self.sm.get_screen('course').ids.box_table.clear_widgets()
         self.sm.get_screen('course').ids.box_table.add_widget(table)
@@ -138,11 +138,12 @@ class ReportGen(MDApp):
         if self.screen.name == 'main':
             col_input = [('ID', dp(30)), ('Name', dp(50)), ('T1', dp(20)), ('T2', dp(20)), ('T3', dp(20))]
             self.clas = row_data[-1]
-            details = self.get_all_items('student', 'class', self.clas)
-            grade = self.get_all_items_cond('grade', 'studentid', details[0][0], 'courseid', row_data[0])
             self.courseid = row_data[0]
-            row_input = [(item[0], item[1] + ' ' + item[2], g[3], g[4], g[5]) for item, g in zip(details, grade) ]
-            self.sm.get_screen('course').ids.box_table.add_widget(self.create_data_table(col_input,row_input))
+            cursor.execute(f'SELECT s.id, fname, lname, term1, term2, term3 from gradingrpa.student as s join gradingrpa.course as c on s.class = c.class join gradingrpa.grade as g on c.id = g.courseid WHERE g.courseid = {self.courseid} and s.class = {self.clas}')
+            grade = cursor.fetchall()
+            row_input = [(item[0], item[1] + ' ' + item[2], item[3], item[4], item[5]) for item in grade]
+            table = self.create_data_table(col_input,row_input)
+            self.sm.get_screen('course').ids.box_table.add_widget(table)
             self.sm.current = 'course'
         elif self.screen.name == 'course':
             details = self.get_all_items_cond('grade', 'studentid', row_data[0], 'courseid', self.courseid)
