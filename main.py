@@ -6,13 +6,9 @@ from kivymd.uix.datatables import MDDataTable
 from kivy.metrics import dp
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.button import MDRaisedButton
-from kivymd.uix.floatlayout import MDFloatLayout
-from kivy.uix.textinput import TextInput
 import mysql.connector as connector
-from datetime import datetime
-from logging import ERROR
-from collections import deque
 import configparser
+from docx import Document
 
 conn = connector.connect(
     host="127.0.0.1",         # Replace with your MySQL server's hostname or IP address
@@ -27,6 +23,8 @@ config = configparser.ConfigParser()
 config.read('config.ini')
 key = config.get('ENCRYPTION', 'key')
 
+class Report(Screen):
+    pass
 class SignIn(Screen):
     pass
 class MainScreen(Screen):
@@ -57,18 +55,32 @@ class ReportGen(MDApp):
                 self.teachername = credentials[0][1] + ' ' + credentials[0][2]
                 self.email = credentials[0][3]
                 self.number = credentials[0][4]
-                print('HERE')
-                self.data_table = self.create_data_table([
-                ("ID", dp(30)),
-                ("Course Name", dp(70)),
-                ('Class ID', dp(30)),
-                ], [(item[0], item[1], item[-1]) for item in self.get_all_items('course', 'teacher', self.teacher)])
-                self.sm.get_screen('main').ids.box_table.add_widget(self.data_table)
-                self.sm.current = 'main'
+                self.get_main_screen('courses')
             else:
                 pass
         else:
             pass
+    def get_main_screen(self, screen):
+        self.sm.get_screen('main').ids.box_table.clear_widgets()
+        if screen == 'courses':
+            self.data_table = self.create_data_table([
+            ("ID", dp(30)),
+            ("Course Name", dp(70)),
+            ('Class ID', dp(30)),
+            ], [(item[0], item[1], item[-1]) for item in self.get_all_items('course', 'teacher', self.teacher)])
+            self.data_table.bind(on_row_press=self.course_row_press)
+            self.sm.get_screen('main').ids.box_table.add_widget(self.data_table)
+            self.sm.current = 'main'
+        elif screen == 'classes':
+            self.data_table = self.create_data_table([
+                ("Class ID", dp(70)),
+                (' ', dp(70))
+            ], [(item[0], '') for item in self.get_all_items('class', 'teacher', self.teacher)])
+            self.data_table.bind(on_row_press=self.class_row_press)
+            self.sm.get_screen('main').ids.box_table.add_widget(self.data_table)
+            pass
+        self.sm.get_screen('main').ids.nav_drawer.set_state('closed')
+
     def create_data_table(self, column_data, row_data):
         """Create an MDDataTable widget."""
         table = MDDataTable(
@@ -82,7 +94,6 @@ class ReportGen(MDApp):
             row_data= row_data,
         )
         table.ids.container.radius = [0, 0, 0, 0]
-        table.bind(on_row_press=self.on_row_press)
         return table
 
     def get_all_items(self, table, cond, val):
@@ -154,7 +165,7 @@ class ReportGen(MDApp):
         )
         dialog.open()
     
-    def on_row_press(self, instance_table, instance_row):
+    def course_row_press(self, instance_table, instance_row):
         row_num = int(instance_row.index/len(instance_table.column_data))
         row_data = instance_table.row_data[row_num]
         print('ROW', row_data)
@@ -193,6 +204,76 @@ class ReportGen(MDApp):
             )
             self.dialog.open()
         print (row_data[0])
+    def class_row_press(self, instance_table, instance_row):
+        row_num = int(instance_row.index/len(instance_table.column_data))
+        row_data = instance_table.row_data[row_num]
+        clas = row_data[0]
+        self.dialog = MDDialog(
+        title= f'Generate Reports for Class {clas}?',
+        type='custom',
+        content_cls= Report(),
+        buttons=[
+            MDRaisedButton(
+                text="Yes",
+                on_release=lambda x: self.generate_reports(clas)
+            ),
+            MDRaisedButton(
+                text="No",
+                on_release=lambda x: self.dialog.dismiss()
+            ),
+            ],
+        )
+        self.dialog.open()
+        print (row_data[0])
+
+    def generate_reports(self, clas):
+        cursor.execute(f'SELECT * FROM STUDENT WHERE class={clas}')
+        students = [x  for x in cursor.fetchall()]
+        for student in students:
+            student_id = student[0]
+            student_name = student[1] + ' ' + student[2]
+            term = self.dialog.content_cls.ids.term.text.strip()
+            # Create a new Document
+            doc = Document()
+
+            # Title
+            doc.add_heading(f'Report Card for {student_name}', 0)
+
+            # Add student details
+            doc.add_paragraph(f'Student Name: {student_name}')
+            
+            # Add table for grades
+            table = doc.add_table(rows=1, cols=2)
+            table.style = 'Table Grid'
+            
+            # Set column names
+            hdr_cells = table.rows[0].cells
+            hdr_cells[0].text = 'Subject'
+            hdr_cells[1].text = 'Grade'
+
+            print(term)
+            cursor.execute(f'SELECT {term}, courseid FROM grade WHERE studentid={student_id}')
+            courses = [x for x in cursor.fetchall()]
+            for course in courses:
+                grade = f'{course[0]}'
+                cursor.execute(f'SELECT name FROM course WHERE id={course[1]}')
+                subject = cursor.fetchall()[0][0]
+                print(grade,subject)
+                
+
+                # Add rows for each subject
+ 
+                row_cells = table.add_row().cells
+                row_cells[0].text = subject
+                row_cells[1].text = grade
+
+                # Add final remarks
+            doc.add_paragraph('\nFinal Remarks:')
+            doc.add_paragraph('Excellent progress in most subjects. Keep up the good work!')
+
+            # Save the document
+            doc.save(f'reports/{student_name}_report_card.docx')
+
 
 if __name__ == "__main__":
     ReportGen().run()

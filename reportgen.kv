@@ -3,6 +3,7 @@ ScreenManager:
     MainScreen:
     CourseScreen:
     Grades:
+    Report:
 
 <SignIn>
     name: 'signin'
@@ -42,10 +43,24 @@ ScreenManager:
         MDTopAppBar:
             title: "ReportGen"
             md_bg_color: app.theme_cls.primary_color
-            left_action_items: [["menu", lambda x: None]]
+            left_action_items: [["menu", lambda x: nav_drawer.set_state('open')]]
             right_action_items: [["plus", lambda x: app.switch_to_add_item_screen()]]
         MDBoxLayout:
             id: box_table
+    MDNavigationDrawer:
+        id: nav_drawer
+        BoxLayout:
+            orientation: "vertical"
+            size_hint: 0.8, 1
+            ScrollView:
+                MDList:
+                    radius: [0,0,0,0]
+                    OneLineListItem:
+                        text: "Courses"
+                        on_release: app.get_main_screen("courses")
+                    OneLineListItem:
+                        text: "Classes"
+                        on_release: app.get_main_screen("classes")
 <CourseScreen>
     name: 'course'
 
@@ -93,3 +108,15 @@ ScreenManager:
             pos_hint: {"center_x": 0.5, "center_y": 0.5}
             multiline: False
             hint_text: 'Term 3 %'
+<Report>
+    name: 'report'
+
+    TextInput:
+        id: term
+        size_hint: (None, None)
+        width: 500
+        height: 50
+        font_size: "15sp"
+        pos_hint: {"center_x": 0.3, "center_y": 0.5}
+        multiline: False
+        hint_text: 'Which Term? (term1, term2, term3)'
