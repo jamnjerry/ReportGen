@@ -1,7 +1,34 @@
 ScreenManager:
+    SignIn:
     MainScreen:
     CourseScreen:
     Grades:
+
+<SignIn>
+    name: 'signin'
+    MDFloatLayout:
+        TextInput:
+            id: term
+            size_hint: (None, None)
+            width: 500
+            height: 50
+            font_size: "15sp"
+            pos_hint: {"center_x": 0.5, "center_y": 0.6}
+            multiline: False
+            hint_text: 'ID'
+        TextInput:
+            id: term
+            size_hint: (None, None)
+            width: 500
+            height: 50
+            font_size: "15sp"
+            pos_hint: {"center_x": 0.5, "center_y": 0.5}
+            multiline: False
+            hint_text: 'Password'
+        MDRaisedButton:
+            text: 'Sign in'
+            pos_hint: {"center_x": 0.5, "center_y": 0.4}
+            on_release: app.sign_in
 
 <MainScreen>:
     name: 'main'

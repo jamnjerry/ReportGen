@@ -23,6 +23,8 @@ conn = connector.connect(
 
 cursor = conn.cursor()
 
+class SignIn(Screen):
+    pass
 class MainScreen(Screen):
     pass
 
