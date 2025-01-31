@@ -8,7 +8,7 @@ ScreenManager:
     name: 'signin'
     MDFloatLayout:
         TextInput:
-            id: term
+            id: id
             size_hint: (None, None)
             width: 500
             height: 50
@@ -17,7 +17,7 @@ ScreenManager:
             multiline: False
             hint_text: 'ID'
         TextInput:
-            id: term
+            id: password
             size_hint: (None, None)
             width: 500
             height: 50
@@ -28,7 +28,7 @@ ScreenManager:
         MDRaisedButton:
             text: 'Sign in'
             pos_hint: {"center_x": 0.5, "center_y": 0.4}
-            on_release: app.sign_in
+            on_release: app.sign_in(id.text, password.text)
 
 <MainScreen>:
     name: 'main'

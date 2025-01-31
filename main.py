@@ -40,14 +40,31 @@ class ReportGen(MDApp):
         self.inventory = []  # List to hold inventory data
         self.theme_cls.primary_palette = "Cyan"
         self.sm = Builder.load_file('reportgen.kv')
-        self.data_table = self.create_data_table([
+        
+        return self.sm
+    
+    def sign_in(self, id, password):
+        key = '7JLiRwx7XoSf6lNRQRt7u9legleNGqKad9CO+IkL8Yg='
+        if id and password:
+            cursor.execute(f"SELECT * FROM teacher WHERE id={id} AND AES_DECRYPT(password, '{key}') = '{password}' ")
+            credentials = cursor.fetchall()
+            if credentials:
+                self.teacher = credentials[0][0]
+                self.teachername = credentials[0][1] + ' ' + credentials[0][2]
+                self.email = credentials[0][3]
+                self.number = credentials[0][4]
+                print('HERE')
+                self.data_table = self.create_data_table([
                 ("ID", dp(30)),
                 ("Course Name", dp(70)),
                 ('Class ID', dp(30)),
-            ], [(item[0], item[1], item[-1]) for item in self.get_all_items('course', 'teacher', self.teacher)])
-        self.sm.get_screen('main').ids.box_table.add_widget(self.data_table)
-        return self.sm
-
+                ], [(item[0], item[1], item[-1]) for item in self.get_all_items('course', 'teacher', self.teacher)])
+                self.sm.get_screen('main').ids.box_table.add_widget(self.data_table)
+                self.sm.current = 'main'
+            else:
+                pass
+        else:
+            pass
     def create_data_table(self, column_data, row_data):
         """Create an MDDataTable widget."""
         table = MDDataTable(
