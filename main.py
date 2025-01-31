@@ -12,6 +12,7 @@ import mysql.connector as connector
 from datetime import datetime
 from logging import ERROR
 from collections import deque
+import configparser
 
 conn = connector.connect(
     host="127.0.0.1",         # Replace with your MySQL server's hostname or IP address
@@ -22,6 +23,9 @@ conn = connector.connect(
 )
 
 cursor = conn.cursor()
+config = configparser.ConfigParser()
+config.read('config.ini')
+key = config.get('ENCRYPTION', 'key')
 
 class SignIn(Screen):
     pass
@@ -44,7 +48,7 @@ class ReportGen(MDApp):
         return self.sm
     
     def sign_in(self, id, password):
-        key = '7JLiRwx7XoSf6lNRQRt7u9legleNGqKad9CO+IkL8Yg='
+        
         if id and password:
             cursor.execute(f"SELECT * FROM teacher WHERE id={id} AND AES_DECRYPT(password, '{key}') = '{password}' ")
             credentials = cursor.fetchall()
