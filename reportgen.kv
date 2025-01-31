@@ -15,6 +15,7 @@ ScreenManager:
             font_size: "15sp"
             pos_hint: {"center_x": 0.5, "center_y": 0.6}
             multiline: False
+            on_text_validate: password.focus = True
             hint_text: 'ID'
         TextInput:
             id: password
@@ -24,6 +25,8 @@ ScreenManager:
             font_size: "15sp"
             pos_hint: {"center_x": 0.5, "center_y": 0.5}
             multiline: False
+            on_text_validate: app.sign_in(id.text, password.text)
+            password: True
             hint_text: 'Password'
         MDRaisedButton:
             text: 'Sign in'

@@ -81,6 +81,7 @@ class ReportGen(MDApp):
             column_data=column_data,
             row_data= row_data,
         )
+        table.ids.container.radius = [0, 0, 0, 0]
         table.bind(on_row_press=self.on_row_press)
         return table
 
