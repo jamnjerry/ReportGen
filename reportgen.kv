@@ -41,7 +41,7 @@ ScreenManager:
         orientation: 'vertical'
         id: box_main
         MDTopAppBar:
-            title: "ReportGen"
+            id: header
             md_bg_color: app.theme_cls.primary_color
             left_action_items: [["menu", lambda x: nav_drawer.set_state('open')]]
             right_action_items: [["plus", lambda x: app.switch_to_add_item_screen()]]
@@ -70,11 +70,26 @@ ScreenManager:
         MDTopAppBar:
             title: "ReportGen"
             md_bg_color: app.theme_cls.primary_color
-            left_action_items: [["menu", lambda x: None]]
+            left_action_items: [["menu", lambda x: nav_drawer.set_state('open')]]
             right_action_items: [["plus", lambda x: app.switch_to_add_item_screen()]]
         MDBoxLayout:
             orientation: 'vertical'
             id: box_table
+            size_hint: (1, 1)
+    MDNavigationDrawer:
+        id: nav_drawer
+        BoxLayout:
+            orientation: "vertical"
+            size_hint: 0.8, 1
+            ScrollView:
+                MDList:
+                    radius: [0,0,0,0]
+                    OneLineListItem:
+                        text: "Courses"
+                        on_release: app.get_main_screen("courses")
+                    OneLineListItem:
+                        text: "Classes"
+                        on_release: app.get_main_screen("classes")
 <Grades>
     name: 'grades'
 

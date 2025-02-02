@@ -42,7 +42,6 @@ class ReportGen(MDApp):
         self.inventory = []  # List to hold inventory data
         self.theme_cls.primary_palette = "Cyan"
         self.sm = Builder.load_file('reportgen.kv')
-        
         return self.sm
     
     def sign_in(self, id, password):
@@ -56,6 +55,7 @@ class ReportGen(MDApp):
                 self.email = credentials[0][3]
                 self.number = credentials[0][4]
                 self.get_main_screen('courses')
+                self.sm.get_screen('main').ids.header.title = 'Welcome ' + self.teachername
             else:
                 pass
         else:
@@ -168,7 +168,7 @@ class ReportGen(MDApp):
     def course_row_press(self, instance_table, instance_row):
         row_num = int(instance_row.index/len(instance_table.column_data))
         row_data = instance_table.row_data[row_num]
-        print('ROW', row_data)
+        print('ROW', row_data, self.sm.current_screen)
         self.screen = self.sm.current_screen
         if self.screen.name == 'main':
             col_input = [('ID', dp(30)), ('Name', dp(50)), ('T1', dp(20)), ('T2', dp(20)), ('T3', dp(20))]
@@ -178,6 +178,10 @@ class ReportGen(MDApp):
             grade = cursor.fetchall()
             row_input = [(item[0], item[1] + ' ' + item[2], item[3], item[4], item[5]) for item in grade]
             table = self.create_data_table(col_input,row_input)
+            table.bind(on_row_press=self.course_row_press)
+            self.sm.get_screen(self.sm.current).ids.box_table.clear_widgets()
+            self.sm.get_screen('course').ids.box_table.clear_widgets()
+            self.sm.get_screen('course').ids.nav_drawer.set_state('close')
             self.sm.get_screen('course').ids.box_table.add_widget(table)
             self.sm.current = 'course'
         elif self.screen.name == 'course':
@@ -188,7 +192,7 @@ class ReportGen(MDApp):
             keys = list(self.sm.get_screen('grades').ids.keys())
             keys = [x for x in keys if keys.index(x) != 0]
             self.dialog = MDDialog(
-            title=self.name,
+            title='Change Grades',
             type="custom",
             content_cls=Grades(),
             buttons=[
