@@ -39,7 +39,6 @@ class Grades(Screen):
 class ReportGen(MDApp):
     teacher = 1
     def build(self):
-        self.inventory = []  # List to hold inventory data
         self.theme_cls.primary_palette = "Cyan"
         self.sm = Builder.load_file('reportgen.kv')
         return self.sm
