@@ -3,6 +3,7 @@ from kivy.properties import StringProperty, NumericProperty
 from kivy.uix.screenmanager import Screen, ScreenManager
 from kivymd.app import MDApp
 from kivymd.uix.datatables import MDDataTable
+from kivymd.uix.list import MDList, TwoLineIconListItem, IconLeftWidget
 from kivy.metrics import dp
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.button import MDRaisedButton
@@ -60,43 +61,37 @@ class ReportGen(MDApp):
         else:
             pass
     def get_main_screen(self, screen):
-        self.sm.get_screen('main').ids.box_table.clear_widgets()
+        self.sm.get_screen('main').ids.scroll_main.clear_widgets()
         if screen == 'courses':
             self.data_table = self.create_data_table([
             ("ID", dp(30)),
             ("Course Name", dp(70)),
             ('Class ID', dp(30)),
             ], [(item[0], item[1], item[-1]) for item in self.get_all_items('course', 'teacher', self.teacher)])
-            self.data_table.bind(on_row_press=self.course_row_press)
-            self.sm.get_screen('main').ids.box_table.add_widget(self.data_table)
+            # self.data_table.bind(on_row_press=self.course_row_press)
+            self.sm.get_screen('main').ids.scroll_main.add_widget(self.data_table)
             self.sm.current = 'main'
         elif screen == 'classes':
             self.data_table = self.create_data_table([
                 ("Class ID", dp(70)),
                 (' ', dp(70))
-            ], [(item[0], '') for item in self.get_all_items('class', 'teacher', self.teacher)])
+            ], [(item[0], item[1]) for item in self.get_all_items('class', 'teacher', self.teacher)])
             self.data_table.bind(on_row_press=self.class_row_press)
-            self.sm.get_screen('main').ids.box_table.add_widget(self.data_table)
+            self.sm.get_screen('main').ids.scroll_main.add_widget(self.data_table)
             pass
         self.sm.get_screen('main').ids.nav_drawer.set_state('closed')
 
     def create_data_table(self, column_data, row_data):
-        """Create an MDDataTable widget."""
-        table = MDDataTable(
-            size_hint=(1, 1),
-            pos_hint= {'center_x': 0.5,'center_y': 0.5},
-            check=True,
-            use_pagination=True,
-            elevation=2,
-            background_color_header="yellow",
-            rows_num=5,
-            column_data=column_data,
-            row_data= row_data,
-            
-        )
-        table.ids.container.radius = [0, 0, 0, 0]
-        table.row_focus = [0, 0, 0, 0]
-        return table
+        """Create an MDList widget."""
+        mdlist = MDList()
+        for thing in row_data:
+            iteration = TwoLineIconListItem(
+                                            IconLeftWidget(icon='signal'),
+                                            text= thing[1], 
+                                            secondary_text= 'ID: ' + str(thing[0]),
+                                            )
+            mdlist.add_widget(iteration)
+        return mdlist
 
     def get_all_items(self, table, cond, val):
         cursor.execute(f"SELECT * FROM {table} WHERE {cond}={val}")

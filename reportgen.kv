@@ -59,10 +59,22 @@ ScreenManager:
             left_action_items: [["menu", lambda x: nav_drawer.set_state('open')]]
             specific_text_color: 'white'
             bold: True
-        MDBoxLayout:
-            id: box_table
-            padding: 0
-            spacing: 0
+        MDFloatLayout:
+            orientation: 'vertical'
+            id: float_table
+            size_hint: (1, 1)
+            # rows:2
+            # MDGridLayout:
+            #     cols: 3
+            #     MDLabel:
+            #         text: 'ID'
+            #     MDLabel:
+            #         text: 'Course Name'
+            #     MDLabel:
+            #         text: 'Class'
+            ScrollView:
+                id: scroll_main
+                x_scroll: False
     MDNavigationDrawer:
         id: nav_drawer
         radius: (0, 0, 0, 0) 
@@ -75,9 +87,12 @@ ScreenManager:
             orientation: "vertical"
             size_hint: 0.8, 1
             MDNavigationDrawerHeader:
-                title: "Menu"
+                title: "ReportGen"
                 title_color: 'green'
-                bold:True
+                padding: "6dp", 0, 0, "30dp"
+                title_bold:True
+            MDNavigationDrawerLabel:
+                text: 'Screens'
             MDNavigationDrawerDivider:
             MDNavigationDrawerItem:
                 text: "Courses"
@@ -87,6 +102,7 @@ ScreenManager:
                 text: "Classes"
                 on_release: app.get_main_screen("classes")
                 icon: 'book'
+
 <CourseScreen>
     name: 'course'
 
@@ -100,10 +116,23 @@ ScreenManager:
             left_action_items: [["menu", lambda x: nav_drawer.set_state('open')]]
             specific_text_color: 'white'
             bold: True
-        MDBoxLayout:
+        MDFloatLayout:
             orientation: 'vertical'
-            id: box_table
+            id: float_table
             size_hint: (1, 1)
+            # rows:2
+            # MDGridLayout:
+            #     cols: 3
+            #     MDLabel:
+            #         text: 'ID'
+            #     MDLabel:
+            #         text: 'Course Name'
+            #     MDLabel:
+            #         text: 'Class'
+            ScrollView:
+                id: scroll_course
+                x_scroll: False
+                
     MDNavigationDrawer:
         id: nav_drawer
         radius: (0, 0, 0, 0) 
@@ -115,9 +144,12 @@ ScreenManager:
             orientation: "vertical"
             size_hint: 0.8, 1
             MDNavigationDrawerHeader:
-                title: "Menu"
+                title: "ReportGen"
                 title_color: 'green'
+                padding: "6dp", 0, 0, "30dp"
                 bold:True
+            MDNavigationDrawerLabel:
+                text: 'Screens'
             MDNavigationDrawerDivider:
             MDNavigationDrawerItem:
                 text: "Courses"
