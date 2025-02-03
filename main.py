@@ -37,9 +37,8 @@ class Grades(Screen):
     pass
 
 class ReportGen(MDApp):
-    teacher = 1
     def build(self):
-        self.theme_cls.primary_palette = "Cyan"
+        self.theme_cls.primary_palette = "Green"
         self.sm = Builder.load_file('reportgen.kv')
         return self.sm
     
@@ -55,6 +54,7 @@ class ReportGen(MDApp):
                 self.number = credentials[0][4]
                 self.get_main_screen('courses')
                 self.sm.get_screen('main').ids.header.title = 'Welcome ' + self.teachername
+                self.sm.get_screen('main').ids.header.title_color = (1,1,1,1)
             else:
                 pass
         else:
@@ -84,15 +84,18 @@ class ReportGen(MDApp):
         """Create an MDDataTable widget."""
         table = MDDataTable(
             size_hint=(1, 1),
+            pos_hint= {'center_x': 0.5,'center_y': 0.5},
             check=True,
             use_pagination=True,
-            elevation=0,
+            elevation=2,
             background_color_header="yellow",
             rows_num=5,
             column_data=column_data,
             row_data= row_data,
+            
         )
         table.ids.container.radius = [0, 0, 0, 0]
+        table.row_focus = [0, 0, 0, 0]
         return table
 
     def get_all_items(self, table, cond, val):

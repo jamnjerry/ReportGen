@@ -8,30 +8,43 @@ ScreenManager:
 <SignIn>
     name: 'signin'
     MDFloatLayout:
-        TextInput:
+        MDLabel:
+            text: 'ReportGen'
+            pos_hint: {'center_x':0.9, "center_y": 0.7}
+            theme_text_color: "Custom"
+            text_color: 'green'
+            font_size: "30sp"
+            bold: True
+        MDTextField:
             id: id
-            size_hint: (None, None)
-            width: 500
-            height: 50
-            font_size: "15sp"
+            hint_text: 'ID'
+            hint_text_mode:'focused'
+            mode: "fill"
+            size_hint_x:None
+            width:500
             pos_hint: {"center_x": 0.5, "center_y": 0.6}
             multiline: False
+            line_color_focus: 'green'
             on_text_validate: password.focus = True
-            hint_text: 'ID'
-        TextInput:
+            
+        MDTextField:
             id: password
-            size_hint: (None, None)
-            width: 500
-            height: 50
+            mode: "fill"
+            color_mode: 'accent'
+            size_hint_x:None
+            width:500
             font_size: "15sp"
             pos_hint: {"center_x": 0.5, "center_y": 0.5}
             multiline: False
+            line_color_focus: 'green'
             on_text_validate: app.sign_in(id.text, password.text)
             password: True
             hint_text: 'Password'
-        MDRaisedButton:
+        MDRectangleFlatButton:
             text: 'Sign in'
             pos_hint: {"center_x": 0.5, "center_y": 0.4}
+            text_color: 'green'
+            line_color: 'green'
             on_release: app.sign_in(id.text, password.text)
 
 <MainScreen>:
@@ -44,14 +57,18 @@ ScreenManager:
             id: header
             md_bg_color: app.theme_cls.primary_color
             left_action_items: [["menu", lambda x: nav_drawer.set_state('open')]]
-            right_action_items: [["plus", lambda x: app.switch_to_add_item_screen()]]
         MDBoxLayout:
             id: box_table
+            padding: 0
+            spacing: 0
     MDNavigationDrawer:
         id: nav_drawer
+        radius: (0, 0, 0, 0) 
         BoxLayout:
             orientation: "vertical"
             size_hint: 0.8, 1
+            MDNavigationDrawerHeader:
+                title: "Menu"
             ScrollView:
                 MDList:
                     radius: [0,0,0,0]
@@ -69,15 +86,16 @@ ScreenManager:
         id: box_course
         MDTopAppBar:
             title: "ReportGen"
+            title_color: 1, 1, 1, 1
             md_bg_color: app.theme_cls.primary_color
             left_action_items: [["menu", lambda x: nav_drawer.set_state('open')]]
-            right_action_items: [["plus", lambda x: app.switch_to_add_item_screen()]]
         MDBoxLayout:
             orientation: 'vertical'
             id: box_table
             size_hint: (1, 1)
     MDNavigationDrawer:
         id: nav_drawer
+        radius: (0, 0, 0, 0) 
         BoxLayout:
             orientation: "vertical"
             size_hint: 0.8, 1
@@ -87,9 +105,6 @@ ScreenManager:
                     OneLineListItem:
                         text: "Courses"
                         on_release: app.get_main_screen("courses")
-                    OneLineListItem:
-                        text: "Classes"
-                        on_release: app.get_main_screen("classes")
 <Grades>
     name: 'grades'
 
