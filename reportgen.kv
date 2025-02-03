@@ -57,6 +57,8 @@ ScreenManager:
             id: header
             md_bg_color: app.theme_cls.primary_color
             left_action_items: [["menu", lambda x: nav_drawer.set_state('open')]]
+            specific_text_color: 'white'
+            bold: True
         MDBoxLayout:
             id: box_table
             padding: 0
@@ -64,20 +66,27 @@ ScreenManager:
     MDNavigationDrawer:
         id: nav_drawer
         radius: (0, 0, 0, 0) 
-        BoxLayout:
+        elevation: 0.5
+        type: 'modal'
+        enable_swiping: False
+        close_on_click: True
+        scrim_color: 0, 0, 0, .8
+        MDNavigationDrawerMenu:
             orientation: "vertical"
             size_hint: 0.8, 1
             MDNavigationDrawerHeader:
                 title: "Menu"
-            ScrollView:
-                MDList:
-                    radius: [0,0,0,0]
-                    OneLineListItem:
-                        text: "Courses"
-                        on_release: app.get_main_screen("courses")
-                    OneLineListItem:
-                        text: "Classes"
-                        on_release: app.get_main_screen("classes")
+                title_color: 'green'
+                bold:True
+            MDNavigationDrawerDivider:
+            MDNavigationDrawerItem:
+                text: "Courses"
+                on_release: app.get_main_screen("courses")
+                icon: 'home'
+            MDNavigationDrawerItem:
+                text: "Classes"
+                on_release: app.get_main_screen("classes")
+                icon: 'book'
 <CourseScreen>
     name: 'course'
 
@@ -89,6 +98,8 @@ ScreenManager:
             title_color: 1, 1, 1, 1
             md_bg_color: app.theme_cls.primary_color
             left_action_items: [["menu", lambda x: nav_drawer.set_state('open')]]
+            specific_text_color: 'white'
+            bold: True
         MDBoxLayout:
             orientation: 'vertical'
             id: box_table
@@ -96,15 +107,22 @@ ScreenManager:
     MDNavigationDrawer:
         id: nav_drawer
         radius: (0, 0, 0, 0) 
-        BoxLayout:
+        type: 'modal'
+        enable_swiping: False
+        close_on_click: True
+        scrim_color: 0, 0, 0, .1
+        MDNavigationDrawerMenu:
             orientation: "vertical"
             size_hint: 0.8, 1
-            ScrollView:
-                MDList:
-                    radius: [0,0,0,0]
-                    OneLineListItem:
-                        text: "Courses"
-                        on_release: app.get_main_screen("courses")
+            MDNavigationDrawerHeader:
+                title: "Menu"
+                title_color: 'green'
+                bold:True
+            MDNavigationDrawerDivider:
+            MDNavigationDrawerItem:
+                text: "Courses"
+                on_release: app.get_main_screen("courses")
+                icon: 'home'
 <Grades>
     name: 'grades'
 
