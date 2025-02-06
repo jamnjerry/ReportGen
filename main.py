@@ -2,8 +2,8 @@ from kivy.lang import Builder
 from kivy.properties import StringProperty, NumericProperty
 from kivy.uix.screenmanager import Screen, ScreenManager
 from kivymd.app import MDApp
-from kivymd.uix.datatables import MDDataTable
-from kivymd.uix.list import MDList, TwoLineIconListItem, IconLeftWidget
+from kivymd.uix.menu import MDDropdownMenu
+from kivymd.uix.list import MDList, ThreeLineIconListItem, IconLeftWidget, OneLineIconListItem
 from kivy.metrics import dp
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.button import MDRaisedButton
@@ -24,6 +24,8 @@ config = configparser.ConfigParser()
 config.read('config.ini')
 key = config.get('ENCRYPTION', 'key')
 
+class Classes(Screen):
+    pass
 class Report(Screen):
     pass
 class SignIn(Screen):
@@ -37,12 +39,52 @@ class CourseScreen(Screen):
 class Grades(Screen):
     pass
 
+class IconListItem(OneLineIconListItem):
+    icon = StringProperty
+
 class ReportGen(MDApp):
     def build(self):
         self.theme_cls.primary_palette = "Green"
         self.sm = Builder.load_file('reportgen.kv')
+        self.menu = MDDropdownMenu()
+        menu_items = [
+            {
+                "viewclass": "IconListItem",
+                "icon": "git",
+                "text": f"Term 1",
+                "height": dp(56),
+                "on_release": lambda x='term1': self.drop_handling(x)
+            },
+            {
+                "viewclass": "IconListItem",
+                "icon": "git",
+                "text": f"Term 2",
+                "height": dp(56),
+                "on_release": lambda x='term2': self.drop_handling(x)
+            },
+            {
+                "viewclass": "IconListItem",
+                "icon": "git",
+                "text": f"Term 3",
+                "height": dp(56),
+                "on_release": lambda x='term3': self.drop_handling(x)
+            }
+            ]
+        self.menu = MDDropdownMenu(
+            caller=self.sm.get_screen('report').ids.term,
+            items=menu_items,
+            position="center",
+            width_mult=4,
+        )
+        self.menu.bind()
         return self.sm
     
+    def drop_handling(self, term):
+        print('HANDLE')
+        self.menu.dismiss()
+        self.dropdown_item.text = term
+        
+
     def sign_in(self, id, password):
         
         if id and password:
@@ -61,23 +103,18 @@ class ReportGen(MDApp):
         else:
             pass
     def get_main_screen(self, screen):
-        self.sm.get_screen('main').ids.scroll_main.clear_widgets()
         if screen == 'courses':
-            self.data_table = self.create_data_table([
-            ("ID", dp(30)),
-            ("Course Name", dp(70)),
-            ('Class ID', dp(30)),
-            ], [(item[0], item[1], item[-1]) for item in self.get_all_items('course', 'teacher', self.teacher)])
+            self.sm.get_screen('main').ids.scroll_main.clear_widgets()
+            self.data_table = self.create_data_table('courses', [(item[0], item[1], item[-1]) for item in self.get_all_items('course', 'teacher', self.teacher)])
             # self.data_table.bind(on_row_press=self.course_row_press)
             self.sm.get_screen('main').ids.scroll_main.add_widget(self.data_table)
             self.sm.current = 'main'
         elif screen == 'classes':
-            self.data_table = self.create_data_table([
-                ("Class ID", dp(70)),
-                (' ', dp(70))
-            ], [(item[0], item[1]) for item in self.get_all_items('class', 'teacher', self.teacher)])
-            self.data_table.bind(on_row_press=self.class_row_press)
-            self.sm.get_screen('main').ids.scroll_main.add_widget(self.data_table)
+            self.sm.get_screen('class').ids.scroll_main.clear_widgets()
+            self.data_table = self.create_data_table('classes', [(item[0], item[1], ' ') for item in self.get_all_items('class', 'teacher', self.teacher)])
+            # self.data_table.bind(on_row_press=self.class_row_press)
+            self.sm.get_screen('class').ids.scroll_main.add_widget(self.data_table)
+            self.sm.current = 'class'
             pass
         self.sm.get_screen('main').ids.nav_drawer.set_state('closed')
 
@@ -85,10 +122,12 @@ class ReportGen(MDApp):
         """Create an MDList widget."""
         mdlist = MDList()
         for thing in row_data:
-            iteration = TwoLineIconListItem(
+            iteration = ThreeLineIconListItem(
                                             IconLeftWidget(icon='signal'),
                                             text= thing[1], 
                                             secondary_text= 'ID: ' + str(thing[0]),
+                                            tertiary_text= str(thing[-1]),
+                                            on_release= lambda x: self.on_row_press(x.text, x.secondary_text, x.tertiary_text),
                                             )
             mdlist.add_widget(iteration)
         return mdlist
@@ -160,29 +199,33 @@ class ReportGen(MDApp):
                 ),
             ],
         )
+        
         dialog.open()
     
-    def course_row_press(self, instance_table, instance_row):
-        row_num = int(instance_row.index/len(instance_table.column_data))
-        row_data = instance_table.row_data[row_num]
-        print('ROW', row_data, self.sm.current_screen)
+    def on_row_press(self, name, id, third):
+        id = id.split(':')[1].strip()
+        self.third = third
+        print(name, id, third)
         self.screen = self.sm.current_screen
+        print(self.screen.name)
         if self.screen.name == 'main':
+            self.courseid = id
+            self.clas = third
             col_input = [('ID', dp(30)), ('Name', dp(50)), ('T1', dp(20)), ('T2', dp(20)), ('T3', dp(20))]
-            self.clas = row_data[-1]
-            self.courseid = row_data[0]
-            cursor.execute(f'SELECT s.id, fname, lname, term1, term2, term3 from gradingrpa.student as s join gradingrpa.course as c on s.class = c.class join gradingrpa.grade as g on c.id = g.courseid WHERE g.courseid = {self.courseid} and s.class = {self.clas}')
+            cursor.execute(f"SELECT s.id, fname, lname, term1, term2, term3 from gradingrpa.student as s join gradingrpa.course as c on s.class = c.class join gradingrpa.grade as g on c.id = g.courseid WHERE g.courseid = '{self.courseid}' and s.class = '{self.clas}'")
             grade = cursor.fetchall()
-            row_input = [(item[0], item[1] + ' ' + item[2], item[3], item[4], item[5]) for item in grade]
+            print(grade)
+            row_input = [(item[0], item[1] + ' ' + item[2], item[3], item[4], item[5], self.clas) for item in grade]
+            print(row_input)
             table = self.create_data_table(col_input,row_input)
-            table.bind(on_row_press=self.course_row_press)
-            self.sm.get_screen(self.sm.current).ids.box_table.clear_widgets()
-            self.sm.get_screen('course').ids.box_table.clear_widgets()
+            self.sm.get_screen(self.sm.current).ids.scroll_main.clear_widgets()
+            self.sm.get_screen('course').ids.scroll_course.clear_widgets()
             self.sm.get_screen('course').ids.nav_drawer.set_state('close')
-            self.sm.get_screen('course').ids.box_table.add_widget(table)
+            self.sm.get_screen('course').ids.scroll_course.add_widget(table)
             self.sm.current = 'course'
         elif self.screen.name == 'course':
-            details = self.get_all_items_cond('grade', 'studentid', row_data[0], 'courseid', self.courseid)
+            cursor.execute(f"SELECT * FROM grade WHERE studentid= '{id}' AND courseid='{self.courseid}'")
+            details = cursor.fetchall()
             print(details)
             studentid = details[0][1]
             # gradedict.keys = self.sm.get_screen('grades').ids
@@ -204,28 +247,30 @@ class ReportGen(MDApp):
                 ],
             )
             self.dialog.open()
-        print (row_data[0])
+        elif self.screen.name == 'class':
+            self.content_cls = Report()
+            self.dropdown_item = self.content_cls.ids.term
+            self.dropdown_item.text = 'Select Term'
+            self.dialog = MDDialog(
+            title= f'Generate Reports for Class {id}?',
+            type='custom',
+            content_cls= self.content_cls,
+            buttons=[
+                MDRaisedButton(
+                    text="Yes",
+                    on_release=lambda x: self.generate_reports(id)
+                ),
+                MDRaisedButton(
+                    text="No",
+                    on_release=lambda x: self.dialog.dismiss()
+                ),
+                ],
+            )
+            self.dialog.open()
+    def course_row_press(self, instance_table, instance_row):
+        pass
     def class_row_press(self, instance_table, instance_row):
-        row_num = int(instance_row.index/len(instance_table.column_data))
-        row_data = instance_table.row_data[row_num]
-        clas = row_data[0]
-        self.dialog = MDDialog(
-        title= f'Generate Reports for Class {clas}?',
-        type='custom',
-        content_cls= Report(),
-        buttons=[
-            MDRaisedButton(
-                text="Yes",
-                on_release=lambda x: self.generate_reports(clas)
-            ),
-            MDRaisedButton(
-                text="No",
-                on_release=lambda x: self.dialog.dismiss()
-            ),
-            ],
-        )
-        self.dialog.open()
-        print (row_data[0])
+        pass
 
     def generate_reports(self, clas):
         cursor.execute(f'SELECT * FROM STUDENT WHERE class={clas}')
@@ -273,7 +318,7 @@ class ReportGen(MDApp):
             doc.add_paragraph('Excellent progress in most subjects. Keep up the good work!')
 
             # Save the document
-            doc.save(f'reports/{student_name}_report_card.docx')
+            doc.save(f'reports/{student_name}_{term}_report_card.docx')
 
 
 if __name__ == "__main__":

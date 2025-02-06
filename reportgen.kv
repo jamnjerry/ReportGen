@@ -4,6 +4,7 @@ ScreenManager:
     CourseScreen:
     Grades:
     Report:
+    Classes:
 
 <SignIn>
     name: 'signin'
@@ -58,6 +59,65 @@ ScreenManager:
             md_bg_color: app.theme_cls.primary_color
             left_action_items: [["menu", lambda x: nav_drawer.set_state('open')]]
             specific_text_color: 'white'
+            elevation: 0
+            bold: True
+        MDFloatLayout:
+            orientation: 'vertical'
+            id: float_table
+            size_hint: (1, 1)
+            # rows:2
+            # MDGridLayout:
+            #     cols: 3
+            #     MDLabel:
+            #         text: 'ID'
+            #     MDLabel:
+            #         text: 'Course Name'
+            #     MDLabel:
+            #         text: 'Class'
+            ScrollView:
+                id: scroll_main
+                x_scroll: False
+    MDNavigationDrawer:
+        id: nav_drawer
+        radius: (0, 0, 0, 0) 
+        elevation: 0.5
+        type: 'modal'
+        enable_swiping: False
+        close_on_click: True
+        scrim_color: 0, 0, 0, .8
+        MDNavigationDrawerMenu:
+            orientation: "vertical"
+            size_hint: 0.8, 1
+            MDNavigationDrawerHeader:
+                title: "ReportGen"
+                title_color: 'green'
+                padding: "6dp", 0, 0, "30dp"
+                title_bold:True
+            MDNavigationDrawerLabel:
+                text: 'Screens'
+            MDNavigationDrawerDivider:
+            MDNavigationDrawerItem:
+                text: "Courses"
+                on_release: app.get_main_screen("courses")
+                icon: 'home'
+            MDNavigationDrawerItem:
+                text: "Classes"
+                on_release: app.get_main_screen("classes")
+                icon: 'book'
+
+<Classes>:
+    name: 'class'
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        id: box_main
+        MDTopAppBar:
+            id: header
+            md_bg_color: app.theme_cls.primary_color
+            left_action_items: [["menu", lambda x: nav_drawer.set_state('open')]]
+            title: 'ReportGen'
+            specific_text_color: 'white'
+            elevation: 0
             bold: True
         MDFloatLayout:
             orientation: 'vertical'
@@ -115,6 +175,7 @@ ScreenManager:
             md_bg_color: app.theme_cls.primary_color
             left_action_items: [["menu", lambda x: nav_drawer.set_state('open')]]
             specific_text_color: 'white'
+            elevation: 0
             bold: True
         MDFloatLayout:
             orientation: 'vertical'
@@ -191,12 +252,12 @@ ScreenManager:
 <Report>
     name: 'report'
 
-    TextInput:
+    MDFillRoundFlatButton:
         id: term
         size_hint: (None, None)
         width: 500
         height: 50
-        font_size: "15sp"
+        fill_color: 'cyan'
+        text_color: 'white'
         pos_hint: {"center_x": 0.3, "center_y": 0.5}
-        multiline: False
-        hint_text: 'Which Term? (term1, term2, term3)'
+        on_release: app.menu.open()
