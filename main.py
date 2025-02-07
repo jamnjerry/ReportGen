@@ -39,6 +39,9 @@ class CourseScreen(Screen):
 class Grades(Screen):
     pass
 
+class Student(Screen):
+    pass
+
 class IconListItem(OneLineIconListItem):
     icon = StringProperty
 
@@ -214,7 +217,6 @@ class ReportGen(MDApp):
             col_input = [('ID', dp(30)), ('Name', dp(50)), ('T1', dp(20)), ('T2', dp(20)), ('T3', dp(20))]
             cursor.execute(f"SELECT s.id, fname, lname, term1, term2, term3 from gradingrpa.student as s join gradingrpa.course as c on s.class = c.class join gradingrpa.grade as g on c.id = g.courseid WHERE g.courseid = '{self.courseid}' and s.class = '{self.clas}'")
             grade = cursor.fetchall()
-            print(grade)
             row_input = [(item[0], item[1] + ' ' + item[2], item[3], item[4], item[5], self.clas) for item in grade]
             print(row_input)
             table = self.create_data_table(col_input,row_input)
@@ -224,29 +226,33 @@ class ReportGen(MDApp):
             self.sm.get_screen('course').ids.scroll_course.add_widget(table)
             self.sm.current = 'course'
         elif self.screen.name == 'course':
-            cursor.execute(f"SELECT * FROM grade WHERE studentid= '{id}' AND courseid='{self.courseid}'")
+            cursor.execute(f"SELECT s.id fname, lname, term1, term2, term3 FROM gradingrpa.student as s join gradingrpa.grade as g on s.id = g.studentid WHERE s.id= '{id}' AND g.courseid='{self.courseid}'")
             details = cursor.fetchall()
             print(details)
-            studentid = details[0][1]
-            # gradedict.keys = self.sm.get_screen('grades').ids
-            keys = list(self.sm.get_screen('grades').ids.keys())
-            keys = [x for x in keys if keys.index(x) != 0]
-            self.dialog = MDDialog(
-            title='Change Grades',
-            type="custom",
-            content_cls=Grades(),
-            buttons=[
-                MDRaisedButton(
-                    text="Submit",
-                    on_release=lambda x: self.update_grade(keys, studentid, self.courseid)
-                ),
-                MDRaisedButton(
-                    text="CLOSE",
-                    on_release=lambda x: self.dialog.dismiss()
-                ),
-                ],
-            )
-            self.dialog.open()
+            self.studentid = details[0][0]
+            self.studentname = details[0][1] + details[0][2]
+            self.sm.get_screen('student').ids.studentname.text = self.studentname
+            
+            # # gradedict.keys = self.sm.get_screen('grades').ids
+            # keys = list(self.sm.get_screen('grades').ids.keys())
+            # keys = [x for x in keys if keys.index(x) != 0]
+            # self.dialog = MDDialog(
+            # title='Change Grades',
+            # type="custom",
+            # content_cls=Grades(),
+            # buttons=[
+            #     MDRaisedButton(
+            #         text="Submit",
+            #         on_release=lambda x: self.update_grade(keys, studentid, self.courseid)
+            #     ),
+            #     MDRaisedButton(
+            #         text="CLOSE",
+            #         on_release=lambda x: self.dialog.dismiss()
+            #     ),
+            #     ],
+            # )
+            # self.dialog.open()
+            self.sm.current = 'student'
         elif self.screen.name == 'class':
             self.content_cls = Report()
             self.dropdown_item = self.content_cls.ids.term

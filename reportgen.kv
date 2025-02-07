@@ -5,6 +5,7 @@ ScreenManager:
     Grades:
     Report:
     Classes:
+    Student:
 
 <SignIn>
     name: 'signin'
@@ -162,6 +163,67 @@ ScreenManager:
                 text: "Classes"
                 on_release: app.get_main_screen("classes")
                 icon: 'book'
+
+<Student>
+    name: 'student'
+    MDBoxLayout:
+        orientation: 'vertical'
+        id: box_student
+        MDTopAppBar:
+            id: header
+            md_bg_color: app.theme_cls.primary_color
+            left_action_items: [["menu", lambda x: nav_drawer.set_state('open')]]
+            title: 'ReportGen'
+            specific_text_color: 'white'
+            elevation: 0
+            bold: True
+    MDGridLayout:
+        rows: 2
+        MDGridLayout:
+            cols:2
+            Image:
+                source: 'photos/johndoe.png'
+            MDGridLayout:
+                rows: 2
+                MDLabel:
+                    id: studentname
+                    text: 'Student Name'
+                MDLabel:
+                    id: class
+                    text: 'Student Class'
+        MDGridLayout:
+            rows: 3
+            MDGridLayout:
+                cols: 3
+                MDLabel:
+                    text: 'Term 1'
+                MDLabel:
+                    id: t1
+                    text: 'X%'
+                MDFillRoundFlatButton:
+                    id: t1btn
+                    text: 'Edit'
+            MDGridLayout:
+                cols: 3
+                MDLabel:
+                    text: 'Term 2'
+                MDLabel:
+                    id: t2
+                    text: 'X%'
+                MDFillRoundFlatButton:
+                    id: t2btn
+                    text: 'Edit'
+            MDGridLayout:
+                cols: 3
+                MDLabel:
+                    text: 'Term 3'
+                MDLabel:
+                    id: t3
+                    text: 'X%'
+                MDFillRoundFlatButton:
+                    id: t3btn
+                    text: 'Edit'
+                    
 
 <CourseScreen>
     name: 'course'
