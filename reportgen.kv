@@ -177,52 +177,73 @@ ScreenManager:
             specific_text_color: 'white'
             elevation: 0
             bold: True
-    MDGridLayout:
-        rows: 2
         MDGridLayout:
-            cols:2
-            Image:
-                source: 'photos/johndoe.png'
+            rows: 2
             MDGridLayout:
-                rows: 2
-                MDLabel:
-                    id: studentname
-                    text: 'Student Name'
-                MDLabel:
-                    id: class
-                    text: 'Student Class'
-        MDGridLayout:
-            rows: 3
+                cols:2
+                Image:
+                    source: 'photos/johndoe.png'
+                MDGridLayout:
+                    rows: 2
+                    MDLabel:
+                        id: studentname
+                    MDLabel:
+                        id: classid
             MDGridLayout:
-                cols: 3
-                MDLabel:
-                    text: 'Term 1'
-                MDLabel:
-                    id: t1
-                    text: 'X%'
-                MDFillRoundFlatButton:
-                    id: t1btn
-                    text: 'Edit'
-            MDGridLayout:
-                cols: 3
-                MDLabel:
-                    text: 'Term 2'
-                MDLabel:
-                    id: t2
-                    text: 'X%'
-                MDFillRoundFlatButton:
-                    id: t2btn
-                    text: 'Edit'
-            MDGridLayout:
-                cols: 3
-                MDLabel:
-                    text: 'Term 3'
-                MDLabel:
-                    id: t3
-                    text: 'X%'
-                MDFillRoundFlatButton:
-                    id: t3btn
-                    text: 'Edit'
+                rows: 3
+                MDGridLayout:
+                    cols: 3
+                    MDLabel:
+                        text: 'Term 1'
+                    MDLabel:
+                        id: t1
+                    MDFillRoundFlatButton:
+                        id: t1btn
+                        text: 'Edit'
+                        on_release: app.edit_grade('Term 1', 'term1')
+                MDGridLayout:
+                    cols: 3
+                    MDLabel:
+                        text: 'Term 2'
+                    MDLabel:
+                        id: t2
+                    MDFillRoundFlatButton:
+                        id: t2btn
+                        text: 'Edit'
+                        on_release: app.edit_grade('Term 2', 'term2')
+                MDGridLayout:
+                    cols: 3
+                    MDLabel:
+                        text: 'Term 3'
+                    MDLabel:
+                        id: t3
+                    MDFillRoundFlatButton:
+                        id: t3btn
+                        text: 'Edit'
+                        on_release: app.edit_grade('Term 3', 'term3')
+    MDNavigationDrawer:
+        id: nav_drawer
+        radius: (0, 0, 0, 0) 
+        elevation: 0.5
+        type: 'modal'
+        enable_swiping: False
+        close_on_click: True
+        scrim_color: 0, 0, 0, .8
+        MDNavigationDrawerMenu:
+            orientation: "vertical"
+            size_hint: 0.8, 1
+            MDNavigationDrawerHeader:
+                title: "ReportGen"
+                title_color: 'green'
+                padding: "6dp", 0, 0, "30dp"
+                title_bold:True
+            MDNavigationDrawerLabel:
+                text: 'Screens'
+            MDNavigationDrawerDivider:
+            MDNavigationDrawerItem:
+                text: "Courses"
+                on_release: app.get_main_screen("courses")
+                icon: 'home'
                     
 
 <CourseScreen>
@@ -255,6 +276,7 @@ ScreenManager:
             ScrollView:
                 id: scroll_course
                 x_scroll: False
+
                 
     MDNavigationDrawer:
         id: nav_drawer
@@ -285,32 +307,14 @@ ScreenManager:
         id: grid_grades
         cols: 3
         TextInput:
-            id: term1
+            id: term
             size_hint: (None, None)
-            width: 200
-            height: 200
-            font_size: "30sp"
+            width: 250
+            height: 50
+            font_size: "20sp"
             pos_hint: {"center_x": 0.5, "center_y": 0.5}
             multiline: False
-            hint_text: 'Term 1 %'
-        TextInput:
-            id: term2
-            size_hint: (None, None)
-            width: 200
-            height: 200
-            font_size: "30sp"
-            pos_hint: {"center_x": 0.5, "center_y": 0.5}
-            multiline: False
-            hint_text: 'Term 2 %'
-        TextInput:
-            id: term3
-            size_hint: (None, None)
-            width: 200
-            height: 200
-            font_size: "30sp"
-            pos_hint: {"center_x": 0.5, "center_y": 0.5}
-            multiline: False
-            hint_text: 'Term 3 %'
+            hint_text: 'Input % (Only number)'
 <Report>
     name: 'report'
 

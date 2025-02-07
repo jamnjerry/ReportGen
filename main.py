@@ -166,27 +166,18 @@ class ReportGen(MDApp):
         self.inventory = self.get_all_items()
         self.data_table.row_data = [(i + 1, item[1], item[2]) for i, item in enumerate(self.inventory)]
     
-    def update_grade(self, keys, studentid, courseid):
-        grade = [self.dialog.content_cls.ids.term1.text.strip(),
-                self.dialog.content_cls.ids.term2.text.strip(),
-                self.dialog.content_cls.ids.term3.text.strip(),
-    ]   
-        gradezip = zip(keys,grade)
-        for key, val in gradezip:
-            if val:
-                print(key, val)
-                cursor.execute(f'UPDATE grade SET {key}={val} WHERE studentid={studentid} AND courseid={courseid}')
-                conn.commit()
-                
-            else:
-                pass
-        col_input = [('ID', dp(30)), ('Name', dp(50)), ('T1', dp(20)), ('T2', dp(20)), ('T3', dp(20))]
-        cursor.execute(f'SELECT s.id, fname, lname, term1, term2, term3 from gradingrpa.student as s join gradingrpa.course as c on s.class = c.class join gradingrpa.grade as g on c.id = g.courseid WHERE g.courseid = {self.courseid} and s.class = {self.clas}')
-        grade = cursor.fetchall()
-        row_input = [(item[0], item[1] + ' ' + item[2], item[3], item[4], item[5]) for item in grade]
-        table = self.create_data_table(col_input,row_input)
-        self.sm.get_screen('course').ids.box_table.clear_widgets()
-        self.sm.get_screen('course').ids.box_table.add_widget(table)
+    def update_grade(self, termval, studentid, courseid):
+        grade = self.dialog.content_cls.ids.term.text.strip()   
+
+        if grade:
+            print(grade)
+            cursor.execute(f'UPDATE grade SET {termval}={grade} WHERE studentid={studentid} AND courseid={courseid}')
+            conn.commit()
+            
+        else:
+            pass
+        inputid = 't' + termval.split('m')[1]
+        self.sm.get_screen('student').ids[inputid].text = grade + '%'
         self.dialog.dismiss()
         
 
@@ -226,32 +217,25 @@ class ReportGen(MDApp):
             self.sm.get_screen('course').ids.scroll_course.add_widget(table)
             self.sm.current = 'course'
         elif self.screen.name == 'course':
-            cursor.execute(f"SELECT s.id fname, lname, term1, term2, term3 FROM gradingrpa.student as s join gradingrpa.grade as g on s.id = g.studentid WHERE s.id= '{id}' AND g.courseid='{self.courseid}'")
+            cursor.execute(f"SELECT s.id, fname, lname, term1, term2, term3, s.class FROM gradingrpa.student as s join gradingrpa.grade as g on s.id = g.studentid WHERE s.id= '{id}' AND g.courseid='{self.courseid}'")
             details = cursor.fetchall()
             print(details)
             self.studentid = details[0][0]
             self.studentname = details[0][1] + details[0][2]
+            self.studentclass = details[0][-1]
+            t1 = str(details[0][3])
+            t2 = str(details[0][4])
+            t3 = str(details[0][5])
             self.sm.get_screen('student').ids.studentname.text = self.studentname
+            self.sm.get_screen('student').ids.classid.text = 'Class ID: ' + str(self.studentclass)
+            self.sm.get_screen('student').ids.t1.text = t1 + '%'
+            self.sm.get_screen('student').ids.t2.text = t2 + '%'
+            self.sm.get_screen('student').ids.t3.text = t3 + '%'
             
             # # gradedict.keys = self.sm.get_screen('grades').ids
             # keys = list(self.sm.get_screen('grades').ids.keys())
             # keys = [x for x in keys if keys.index(x) != 0]
-            # self.dialog = MDDialog(
-            # title='Change Grades',
-            # type="custom",
-            # content_cls=Grades(),
-            # buttons=[
-            #     MDRaisedButton(
-            #         text="Submit",
-            #         on_release=lambda x: self.update_grade(keys, studentid, self.courseid)
-            #     ),
-            #     MDRaisedButton(
-            #         text="CLOSE",
-            #         on_release=lambda x: self.dialog.dismiss()
-            #     ),
-            #     ],
-            # )
-            # self.dialog.open()
+            # 
             self.sm.current = 'student'
         elif self.screen.name == 'class':
             self.content_cls = Report()
@@ -273,6 +257,23 @@ class ReportGen(MDApp):
                 ],
             )
             self.dialog.open()
+    def edit_grade(self, term, termval):
+        self.dialog = MDDialog(
+            title=f'Edit {term} Grades',
+            type="custom",
+            content_cls=Grades(),
+            buttons=[
+                MDRaisedButton(
+                    text="Submit",
+                    on_release=lambda x: self.update_grade(termval, self.studentid, self.courseid)
+                ),
+                MDRaisedButton(
+                    text="CLOSE",
+                    on_release=lambda x: self.dialog.dismiss()
+                ),
+                ],
+            )
+        self.dialog.open()
     def course_row_press(self, instance_table, instance_row):
         pass
     def class_row_press(self, instance_table, instance_row):
