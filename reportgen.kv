@@ -60,18 +60,30 @@ ScreenManager:
         id: box_main
         MDTopAppBar:
             id: header
-            md_bg_color: app.theme_cls.primary_color
+            md_bg_color: 'black'
             left_action_items: [["menu", lambda x: nav_drawer.set_state('open')]]
             specific_text_color: 'white'
             elevation: 0
             bold: True
-        MDFloatLayout:
-            orientation: 'vertical'
-            id: float_table
-            size_hint: (1, 1)
-            ScrollView:
-                id: scroll_main
-                x_scroll: False
+            title: 'ReportGen'
+            title_color: 1,1,1,1
+        MDGridLayout:
+            rows: 2
+            MDLabel:
+                id: mainwelcome
+                bold: True
+                size_hint_y: None
+                height: "85dp"
+                font_size: '30sp'
+                theme_text_color: 'Custom'
+                text_color: 0.36,0.44,0.36,1
+            MDFloatLayout:
+                orientation: 'vertical'
+                id: float_table
+                size_hint: (1, 1)
+                ScrollView:
+                    id: scroll_main
+                    x_scroll: False
     MDNavigationDrawer:
         id: nav_drawer
         radius: (0, 0, 0, 0) 

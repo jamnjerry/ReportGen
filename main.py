@@ -1,9 +1,10 @@
 from kivy.lang import Builder
 from kivy.properties import StringProperty, NumericProperty
-from kivy.uix.screenmanager import Screen, ScreenManager
+from kivy.uix.screenmanager import Screen, ScreenManager, FadeTransition
 from kivymd.app import MDApp
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.list import MDList, ThreeLineIconListItem, IconLeftWidget, OneLineIconListItem
+from kivymd.uix.card import MDSeparator
 from kivy.metrics import dp
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.button import MDRaisedButton
@@ -95,12 +96,13 @@ class ReportGen(MDApp):
             credentials = cursor.fetchall()
             if credentials:
                 self.teacher = credentials[0][0]
-                self.teachername = credentials[0][1] + ' ' + credentials[0][2]
+                self.teacherfname = credentials[0][1] 
+                self.teacherlname = credentials[0][2]
                 self.email = credentials[0][3]
                 self.number = credentials[0][4]
+                self.sm.transition = FadeTransition(duration=2)
                 self.get_main_screen('courses')
-                self.sm.get_screen('main').ids.header.title = 'Welcome ' + self.teachername
-                self.sm.get_screen('main').ids.header.title_color = (1,1,1,1)
+                
             else:
                 self.sm.get_screen('signin').ids.teacherid.helper_text =  'ID and/or Password May Be Wrong, Please Try again'
                 self.sm.get_screen('signin').ids.password.helper_text =  'ID and/or Password May Be Wrong, Please Try again'
@@ -113,6 +115,7 @@ class ReportGen(MDApp):
             self.sm.get_screen('signin').ids.password.error = True
     def get_main_screen(self, screen):
         if screen == 'courses':
+            self.sm.get_screen('main').ids.mainwelcome.text = f'Hi {self.teacherfname}, here are the subjects\n you are teaching this term...'
             self.sm.get_screen('main').ids.scroll_main.clear_widgets()
             self.data_table = self.create_data_table('courses', [(item[0], item[1], item[-1]) for item in self.get_all_items('course', 'teacher', self.teacher)])
             # self.data_table.bind(on_row_press=self.course_row_press)
@@ -131,12 +134,17 @@ class ReportGen(MDApp):
     def create_data_table(self, column_data, row_data):
         """Create an MDList widget."""
         mdlist = MDList()
+        div = MDSeparator()
+        div.line_color = [0, 0, 0, 1]
+        mdlist.add_widget(div)
         for thing in row_data:
             iteration = ThreeLineIconListItem(
                                             IconLeftWidget(icon='signal'),
                                             text= thing[1], 
                                             secondary_text= 'ID: ' + str(thing[0]),
                                             tertiary_text= str(thing[-1]),
+                                            divider_color= (0,0,0,1),
+                                            bg_color = (0,0,0,0.1),
                                             on_release= lambda x: self.on_row_press(x.text, x.secondary_text, x.tertiary_text),
                                             )
             mdlist.add_widget(iteration)
