@@ -102,9 +102,15 @@ class ReportGen(MDApp):
                 self.sm.get_screen('main').ids.header.title = 'Welcome ' + self.teachername
                 self.sm.get_screen('main').ids.header.title_color = (1,1,1,1)
             else:
-                pass
+                self.sm.get_screen('signin').ids.teacherid.helper_text =  'ID and/or Password May Be Wrong, Please Try again'
+                self.sm.get_screen('signin').ids.password.helper_text =  'ID and/or Password May Be Wrong, Please Try again'
+                self.sm.get_screen('signin').ids.teacherid.error = True
+                self.sm.get_screen('signin').ids.password.error = True
         else:
-            pass
+            self.sm.get_screen('signin').ids.teacherid.helper_text =  'Both Fields Must Be Completed'
+            self.sm.get_screen('signin').ids.password.helper_text =  'Both Fields Must Be Completed'
+            self.sm.get_screen('signin').ids.teacherid.error = True
+            self.sm.get_screen('signin').ids.password.error = True
     def get_main_screen(self, screen):
         if screen == 'courses':
             self.sm.get_screen('main').ids.scroll_main.clear_widgets()
@@ -120,6 +126,7 @@ class ReportGen(MDApp):
             self.sm.current = 'class'
             pass
         self.sm.get_screen('main').ids.nav_drawer.set_state('closed')
+        self.sm.get_screen('student').ids.nav_drawer.set_state('closed')
 
     def create_data_table(self, column_data, row_data):
         """Create an MDList widget."""
@@ -221,7 +228,7 @@ class ReportGen(MDApp):
             details = cursor.fetchall()
             print(details)
             self.studentid = details[0][0]
-            self.studentname = details[0][1] + details[0][2]
+            self.studentname = details[0][1] + ' ' + details[0][2]
             self.studentclass = details[0][-1]
             t1 = str(details[0][3])
             t2 = str(details[0][4])
