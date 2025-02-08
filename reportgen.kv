@@ -69,15 +69,6 @@ ScreenManager:
             orientation: 'vertical'
             id: float_table
             size_hint: (1, 1)
-            # rows:2
-            # MDGridLayout:
-            #     cols: 3
-            #     MDLabel:
-            #         text: 'ID'
-            #     MDLabel:
-            #         text: 'Course Name'
-            #     MDLabel:
-            #         text: 'Class'
             ScrollView:
                 id: scroll_main
                 x_scroll: False
@@ -127,15 +118,6 @@ ScreenManager:
             orientation: 'vertical'
             id: float_table
             size_hint: (1, 1)
-            # rows:2
-            # MDGridLayout:
-            #     cols: 3
-            #     MDLabel:
-            #         text: 'ID'
-            #     MDLabel:
-            #         text: 'Course Name'
-            #     MDLabel:
-            #         text: 'Class'
             ScrollView:
                 id: scroll_main
                 x_scroll: False
@@ -190,10 +172,18 @@ ScreenManager:
                     id: studentname
                     halign: 'center'
                     pos_hint: {"center_y": 0.3}
+                    bold: True
+                    theme_text_color: 'Custom'
+                    text_color: 0,0,0,0.8
+                    font_size: "30sp"
                 MDLabel:
                     id: classid
                     halign: 'center'
                     pos_hint: {"center_y": 0.2}
+                    bold: True
+                    theme_text_color: 'Custom'
+                    text_color: 0,0,0,0.8
+                    font_size: "20sp"
             MDGridLayout:
                 rows: 3
                 MDBoxLayout:
@@ -201,9 +191,26 @@ ScreenManager:
                     MDLabel:
                         text: 'Term 1'
                         halign: 'right'
-                    MDLabel:
-                        id: t1
-                        halign: 'center'
+                        bold: True
+                        theme_text_color: 'Custom'
+                        text_color: app.theme_cls.primary_color
+                        font_size: "20sp"
+                    MDFloatLayout:
+                        pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                        MDCard:
+                            size_hint: None, None
+                            size: 100, 100
+                            radius: [100, 100, 100, 100]  # Makes it a perfect circle
+                            elevation: 0
+                            fit_image: True
+                            md_bg_color: app.theme_cls.primary_color
+                            pos_hint: {'center_x': 0.5, 'center_y':0.5}
+                            MDLabel:
+                                id: t1
+                                halign: 'center'
+                                theme_text_color: 'Custom'
+                                text_color: 1,1,1,1
+                                bold: True
                     MDBoxLayout:
                         MDRectangleFlatButton:
                             id: t1btn
@@ -216,9 +223,26 @@ ScreenManager:
                         text: 'Term 2'
                         size_hint_x: 1
                         halign: 'right'
-                    MDLabel:
-                        id: t2
-                        halign: 'center'
+                        bold: True
+                        theme_text_color: 'Custom'
+                        text_color: app.theme_cls.primary_color
+                        font_size: "20sp"
+                    MDFloatLayout:
+                        pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                        MDCard:
+                            size_hint: None, None
+                            size: 100, 100
+                            radius: [100, 100, 100, 100]  # Makes it a perfect circle
+                            elevation: 0
+                            fit_image: True
+                            md_bg_color: app.theme_cls.primary_color
+                            pos_hint: {'center_x': 0.5, 'center_y':0.5}
+                            MDLabel:
+                                id: t2
+                                halign: 'center'
+                                theme_text_color: 'Custom'
+                                text_color: 1,1,1,1
+                                bold: True
                     MDBoxLayout:
                         MDRectangleFlatButton:
                             id: t2btn
@@ -231,10 +255,26 @@ ScreenManager:
                         text: 'Term 3'
                         size_hint_x: 1
                         halign: 'right'
-                    MDLabel:
-                        id: t3
-                        size_hint_x: 1
-                        halign: 'center'
+                        bold: True
+                        theme_text_color: 'Custom'
+                        text_color: app.theme_cls.primary_color
+                        font_size: "20sp"
+                    MDFloatLayout:
+                        pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                        MDCard:
+                            size_hint: None, None
+                            size: 100, 100
+                            radius: [100, 100, 100, 100]  # Makes it a perfect circle
+                            elevation: 0
+                            fit_image: True
+                            md_bg_color: app.theme_cls.primary_color
+                            pos_hint: {'center_x': 0.5, 'center_y':0.5}
+                            MDLabel:
+                                id: t3
+                                halign: 'center'
+                                theme_text_color: 'Custom'
+                                text_color: 1,1,1,1
+                                bold: True
                     MDBoxLayout:
                         MDRectangleFlatButton:
                             id: t3btn
@@ -341,12 +381,13 @@ ScreenManager:
 <Report>
     name: 'report'
 
-    MDFillRoundFlatButton:
-        id: term
-        size_hint: (None, None)
-        width: 500
-        height: 50
-        fill_color: 'cyan'
-        text_color: 'white'
-        pos_hint: {"center_x": 0.3, "center_y": 0.5}
-        on_release: app.menu.open()
+    MDFloatLayout:
+        Button:
+            id: term
+            size_hint: (None, None)
+            width: 500
+            height: 50
+            fill_color: 'cyan'
+            text_color: 'white'
+            pos_hint: {"center_x": 0.3, "center_y": 0.5}
+            on_release: app.menu.open()

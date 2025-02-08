@@ -76,7 +76,7 @@ class ReportGen(MDApp):
         self.menu = MDDropdownMenu(
             caller=self.sm.get_screen('report').ids.term,
             items=menu_items,
-            position="center",
+            position="bottom",
             width_mult=4,
         )
         self.menu.bind()
