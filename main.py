@@ -3,6 +3,12 @@ from kivy.properties import StringProperty, NumericProperty
 from kivy.uix.screenmanager import Screen, ScreenManager, FadeTransition
 from kivymd.app import MDApp
 from kivymd.uix.menu import MDDropdownMenu
+from kivymd.uix.button import MDIconButton
+from kivymd.uix.card import MDCard
+from kivymd.uix.label import MDLabel
+from kivymd.uix.relativelayout import MDRelativeLayout
+from kivymd.uix.gridlayout import MDGridLayout
+from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.list import MDList, ThreeLineIconListItem, IconLeftWidget, OneLineIconListItem
 from kivymd.uix.card import MDSeparator
 from kivy.metrics import dp
@@ -48,7 +54,7 @@ class IconListItem(OneLineIconListItem):
 
 class ReportGen(MDApp):
     def build(self):
-        self.theme_cls.primary_palette = "Green"
+        self.theme_cls.primary_palette = 'Gray'
         self.sm = Builder.load_file('reportgen.kv')
         self.menu = MDDropdownMenu()
         menu_items = [
@@ -117,13 +123,21 @@ class ReportGen(MDApp):
         if screen == 'courses':
             self.sm.get_screen('main').ids.mainwelcome.text = f'Hi {self.teacherfname}, here are the subjects\n you are teaching this term...'
             self.sm.get_screen('main').ids.scroll_main.clear_widgets()
-            self.data_table = self.create_data_table('courses', [(item[0], item[1], item[-1]) for item in self.get_all_items('course', 'teacher', self.teacher)])
+            cursor.execute(f'SELECT name, id, class FROM course where teacher={self.teacher}')
+            coursedetails = cursor.fetchall()
+            print('course', coursedetails)
+            details = []
+            for course in coursedetails:
+                ide = course[2]
+                cursor.execute(f'SELECT name FROM class where id={ide}')
+                new = course + cursor.fetchall()[0]
+                details.append(new)
+            self.sm.get_screen('main').ids.scroll_main.add_widget(self.create_cards(details))
             # self.data_table.bind(on_row_press=self.course_row_press)
-            self.sm.get_screen('main').ids.scroll_main.add_widget(self.data_table)
             self.sm.current = 'main'
         elif screen == 'classes':
             self.sm.get_screen('class').ids.scroll_main.clear_widgets()
-            self.data_table = self.create_data_table('classes', [(item[0], item[1], ' ') for item in self.get_all_items('class', 'teacher', self.teacher)])
+            self.data_table = self.create_list('classes', [(item[0], item[1], ' ') for item in self.get_all_items('class', 'teacher', self.teacher)])
             # self.data_table.bind(on_row_press=self.class_row_press)
             self.sm.get_screen('class').ids.scroll_main.add_widget(self.data_table)
             self.sm.current = 'class'
@@ -131,7 +145,7 @@ class ReportGen(MDApp):
         self.sm.get_screen('main').ids.nav_drawer.set_state('closed')
         self.sm.get_screen('student').ids.nav_drawer.set_state('closed')
 
-    def create_data_table(self, column_data, row_data):
+    def create_list(self, column_data, row_data):
         """Create an MDList widget."""
         mdlist = MDList()
         div = MDSeparator()
@@ -149,6 +163,49 @@ class ReportGen(MDApp):
                                             )
             mdlist.add_widget(iteration)
         return mdlist
+    
+    def create_cards(self, row_data):
+        
+        grid = MDGridLayout(cols=4,
+                            padding= "20dp",
+                            spacing= "20dp",
+                            size_hint_y=None,  # Ensures it expands beyond screen
+                            width=self.root.width,
+                            height = 1000
+                            )
+        for course in row_data:
+            print(course)
+            card = MDCard(
+                    MDRelativeLayout(
+                        MDIconButton(
+                            icon="dots-vertical",
+                            pos_hint={"top": 1, "right": 1}
+                        ),
+                        MDLabel(
+                            text=course[0],
+                            adaptive_size=True,
+                            pos=("12dp", "44dp"),
+                        ),
+                        MDLabel(
+                            text=course[-1],
+                            adaptive_size=True,
+                            pos=("12dp", "28dp"),
+                        ),
+                         MDLabel(
+                            text='Subject ID: ' + str(course[1]),
+                            adaptive_size=True,
+                            pos=("12dp", "12dp"),
+                        ),
+                    ),
+                    style='elevated',
+                    padding="4dp",
+                    size_hint=(None, None),
+                    size=("260dp", "300dp"),
+                    ripple_behavior=True,
+                )
+            grid.add_widget(card)
+            
+        return grid
 
     def get_all_items(self, table, cond, val):
         cursor.execute(f"SELECT * FROM {table} WHERE {cond}={val}")
@@ -246,11 +303,6 @@ class ReportGen(MDApp):
             self.sm.get_screen('student').ids.t1.text = t1 + '%'
             self.sm.get_screen('student').ids.t2.text = t2 + '%'
             self.sm.get_screen('student').ids.t3.text = t3 + '%'
-            
-            # # gradedict.keys = self.sm.get_screen('grades').ids
-            # keys = list(self.sm.get_screen('grades').ids.keys())
-            # keys = [x for x in keys if keys.index(x) != 0]
-            # 
             self.sm.current = 'student'
         elif self.screen.name == 'class':
             self.content_cls = Report()

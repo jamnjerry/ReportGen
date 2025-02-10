@@ -78,12 +78,21 @@ ScreenManager:
                 theme_text_color: 'Custom'
                 text_color: 0.36,0.44,0.36,1
             MDFloatLayout:
-                orientation: 'vertical'
-                id: float_table
-                size_hint: (1, 1)
+                orientation:'vertical'
                 ScrollView:
                     id: scroll_main
-                    x_scroll: False
+                    size_hint: (1,1)
+                    do_scroll_x: False
+                    do_scroll_y: True
+                    scroll_type: ['bars']
+                    bar_width: 10  # Makes scrollbar visible
+                    bar_color: 0, 0, 0, 0.7
+
+                        # cols: 3
+                        # spacing: "10dp"
+                        # padding: "10dp"
+                        # size_hint_y: None
+                        # height: self.minimum_height
     MDNavigationDrawer:
         id: nav_drawer
         radius: (0, 0, 0, 0) 
