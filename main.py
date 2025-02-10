@@ -12,6 +12,7 @@ from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.list import MDList, ThreeLineIconListItem, IconLeftWidget, OneLineIconListItem
 from kivymd.uix.card import MDSeparator
 from kivy.metrics import dp
+from kivymd.uix.fitimage import FitImage
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.button import MDRaisedButton
 import mysql.connector as connector
@@ -121,7 +122,7 @@ class ReportGen(MDApp):
             self.sm.get_screen('signin').ids.password.error = True
     def get_main_screen(self, screen):
         if screen == 'courses':
-            self.sm.get_screen('main').ids.mainwelcome.text = f'Hi {self.teacherfname}, here are the subjects\n you are teaching this term...'
+            # self.sm.get_screen('main').ids.mainwelcome.text = f'Hi {self.teacherfname}, here are the subjects\n you are teaching this term...'
             self.sm.get_screen('main').ids.scroll_main.clear_widgets()
             cursor.execute(f'SELECT name, id, class FROM course where teacher={self.teacher}')
             coursedetails = cursor.fetchall()
@@ -170,13 +171,23 @@ class ReportGen(MDApp):
                             padding= "20dp",
                             spacing= "20dp",
                             size_hint_y=None,  # Ensures it expands beyond screen
-                            width=self.root.width,
+                            width=500,
                             height = 1000
                             )
+
+        # Center the grid_layout inside the scrollview
+        grid.pos_hint = {"center_x": 0.5}
         for course in row_data:
             print(course)
             card = MDCard(
                     MDRelativeLayout(
+                        FitImage(
+                        source="photos/stock.jpg",
+                        size_hint_y=0.6,
+                        size_hint_x= 1,
+                        pos_hint={"top": 1},
+                        radius=(dp(16), dp(16), 0, 0),
+                        ),
                         MDIconButton(
                             icon="dots-vertical",
                             pos_hint={"top": 1, "right": 1}
@@ -184,17 +195,17 @@ class ReportGen(MDApp):
                         MDLabel(
                             text=course[0],
                             adaptive_size=True,
-                            pos=("12dp", "44dp"),
+                            pos=("12dp", "54dp"),
                         ),
                         MDLabel(
                             text=course[-1],
                             adaptive_size=True,
-                            pos=("12dp", "28dp"),
+                            pos=("12dp", "35dp"),
                         ),
                          MDLabel(
                             text='Subject ID: ' + str(course[1]),
                             adaptive_size=True,
-                            pos=("12dp", "12dp"),
+                            pos=("12dp", "18dp"),
                         ),
                     ),
                     style='elevated',

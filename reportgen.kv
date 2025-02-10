@@ -65,28 +65,17 @@ ScreenManager:
             specific_text_color: 'white'
             elevation: 0
             bold: True
-            title: 'ReportGen'
+            title: 'Subjects'
             title_color: 1,1,1,1
-        MDGridLayout:
-            rows: 2
-            MDLabel:
-                id: mainwelcome
-                bold: True
-                size_hint_y: None
-                height: "85dp"
-                font_size: '30sp'
-                theme_text_color: 'Custom'
-                text_color: 0.36,0.44,0.36,1
-            MDFloatLayout:
-                orientation:'vertical'
-                ScrollView:
-                    id: scroll_main
-                    size_hint: (1,1)
-                    do_scroll_x: False
-                    do_scroll_y: True
-                    scroll_type: ['bars']
-                    bar_width: 10  # Makes scrollbar visible
-                    bar_color: 0, 0, 0, 0.7
+        MDFloatLayout:
+            ScrollView:
+                id: scroll_main
+                size_hint: (1,1)
+                do_scroll_x: False
+                do_scroll_y: True
+                scroll_type: ['bars']
+                bar_width: 10  # Makes scrollbar visible
+                bar_color: 0, 0, 0, 0.7
 
                         # cols: 3
                         # spacing: "10dp"
