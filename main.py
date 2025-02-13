@@ -55,7 +55,7 @@ class IconListItem(OneLineIconListItem):
 
 class ReportGen(MDApp):
     def build(self):
-        self.theme_cls.primary_palette = 'Gray'
+        self.theme_cls.primary_palette = 'Green'
         self.sm = Builder.load_file('reportgen.kv')
         self.menu = MDDropdownMenu()
         menu_items = [
@@ -107,7 +107,6 @@ class ReportGen(MDApp):
                 self.teacherlname = credentials[0][2]
                 self.email = credentials[0][3]
                 self.number = credentials[0][4]
-                self.sm.transition = FadeTransition(duration=2)
                 self.get_main_screen('courses')
                 
             else:
@@ -149,9 +148,6 @@ class ReportGen(MDApp):
     def create_list(self, column_data, row_data):
         """Create an MDList widget."""
         mdlist = MDList()
-        div = MDSeparator()
-        div.line_color = [0, 0, 0, 1]
-        mdlist.add_widget(div)
         for thing in row_data:
             iteration = ThreeLineIconListItem(
                                             IconLeftWidget(icon='signal'),
@@ -168,11 +164,11 @@ class ReportGen(MDApp):
     def create_cards(self, row_data):
         
         grid = MDGridLayout(cols=4,
-                            padding= "20dp",
-                            spacing= "20dp",
+                            padding= "50dp",
+                            spacing= "50dp",
                             size_hint_y=None,  # Ensures it expands beyond screen
-                            width=500,
-                            height = 1000
+                            size_hint_x = 1,
+                            height = 1500,
                             )
 
         # Center the grid_layout inside the scrollview
@@ -193,19 +189,23 @@ class ReportGen(MDApp):
                             pos_hint={"top": 1, "right": 1}
                         ),
                         MDLabel(
-                            text=course[0],
+                            text=course[0] ,
                             adaptive_size=True,
                             pos=("12dp", "54dp"),
+                            bold = True,
+                            font_size= '100sp'
                         ),
                         MDLabel(
-                            text=course[-1],
+                            text=course[-1] + f' ({course[2]})',
                             adaptive_size=True,
                             pos=("12dp", "35dp"),
+                            id='classname'
                         ),
                          MDLabel(
                             text='Subject ID: ' + str(course[1]),
                             adaptive_size=True,
                             pos=("12dp", "18dp"),
+                            id='subjectid'
                         ),
                     ),
                     style='elevated',
@@ -213,6 +213,8 @@ class ReportGen(MDApp):
                     size_hint=(None, None),
                     size=("260dp", "300dp"),
                     ripple_behavior=True,
+                    pos_hint= {'center_x': 0.5,'center_y': 0.5}, 
+                    on_release= lambda instance: self.on_card_press( instance.children[0].ids['subjectid'].text, instance.children[0].ids['classname'].text)
                 )
             grid.add_widget(card)
             
@@ -279,28 +281,33 @@ class ReportGen(MDApp):
         
         dialog.open()
     
-    def on_row_press(self, name, id, third):
+    def on_card_press(self, id, classname):
         id = id.split(':')[1].strip()
-        self.third = third
-        print(name, id, third)
+        classid = classname.split('(')[1].split(')')[0]
+        print(id, classname)
         self.screen = self.sm.current_screen
         print(self.screen.name)
         if self.screen.name == 'main':
-            self.courseid = id
-            self.clas = third
+            
             col_input = [('ID', dp(30)), ('Name', dp(50)), ('T1', dp(20)), ('T2', dp(20)), ('T3', dp(20))]
-            cursor.execute(f"SELECT s.id, fname, lname, term1, term2, term3 from gradingrpa.student as s join gradingrpa.course as c on s.class = c.class join gradingrpa.grade as g on c.id = g.courseid WHERE g.courseid = '{self.courseid}' and s.class = '{self.clas}'")
+            cursor.execute(f"SELECT s.id, fname, lname, term1, term2, term3 from gradingrpa.student as s join gradingrpa.course as c on s.class = c.class join gradingrpa.grade as g on c.id = g.courseid WHERE g.courseid = '{id}' and s.class = '{classid}'")
             grade = cursor.fetchall()
-            row_input = [(item[0], item[1] + ' ' + item[2], item[3], item[4], item[5], self.clas) for item in grade]
+            row_input = [(item[0], item[1] + ' ' + item[2], item[3], item[4], item[5], id) for item in grade]
             print(row_input)
-            table = self.create_data_table(col_input,row_input)
+            table = self.create_list(col_input,row_input)
             self.sm.get_screen(self.sm.current).ids.scroll_main.clear_widgets()
             self.sm.get_screen('course').ids.scroll_course.clear_widgets()
             self.sm.get_screen('course').ids.nav_drawer.set_state('close')
             self.sm.get_screen('course').ids.scroll_course.add_widget(table)
             self.sm.current = 'course'
-        elif self.screen.name == 'course':
-            cursor.execute(f"SELECT s.id, fname, lname, term1, term2, term3, s.class FROM gradingrpa.student as s join gradingrpa.grade as g on s.id = g.studentid WHERE s.id= '{id}' AND g.courseid='{self.courseid}'")
+    
+    def on_row_press(self, name, id, courseid):
+        self.screen = self.sm.current_screen
+        id = id.split(':')[1].strip()
+        print(id, courseid)
+        self.courseid = courseid
+        if self.screen.name == 'course':
+            cursor.execute(f"SELECT s.id, fname, lname, term1, term2, term3, s.class FROM gradingrpa.student as s join gradingrpa.grade as g on s.id = g.studentid WHERE s.id= '{id}' AND g.courseid='{courseid}'")
             details = cursor.fetchall()
             print(details)
             self.studentid = details[0][0]

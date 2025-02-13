@@ -13,8 +13,6 @@ ScreenManager:
         MDLabel:
             text: 'ReportGen'
             pos_hint: {'center_x':0.9, "center_y": 0.75}
-            theme_text_color: "Custom"
-            text_color: 'green'
             font_size: "30sp"
             bold: True
         MDTextField:
@@ -26,7 +24,6 @@ ScreenManager:
             width:500
             pos_hint: {"center_x": 0.5, "center_y": 0.6}
             multiline: False
-            line_color_focus: 'green'
             on_text_validate: password.focus = True
             helper_text: 'ID and/or Password May Be Wrong, Please Try again'
             helper_text_mode: 'on_error'
@@ -39,7 +36,6 @@ ScreenManager:
             font_size: "15sp"
             pos_hint: {"center_x": 0.5, "center_y": 0.45}
             multiline: False
-            line_color_focus: 'green'
             on_text_validate: app.sign_in(teacherid.text, password.text)
             password: True
             hint_text: 'Password'
@@ -48,8 +44,6 @@ ScreenManager:
         MDRectangleFlatButton:
             text: 'Sign in'
             pos_hint: {"center_x": 0.5, "center_y": 0.3}
-            text_color: 'green'
-            line_color: 'green'
             on_release: app.sign_in(id.text, password.text)
 
 <MainScreen>:
@@ -60,8 +54,9 @@ ScreenManager:
         id: box_main
         MDTopAppBar:
             id: header
-            md_bg_color: 'black'
+            md_bg_color: app.theme_cls.primary_color
             left_action_items: [["menu", lambda x: nav_drawer.set_state('open')]]
+            right_action_items: [["help-circle-outline"]]
             specific_text_color: 'white'
             elevation: 0
             bold: True
@@ -71,7 +66,7 @@ ScreenManager:
             ScrollView:
                 id: scroll_main
                 size_hint: (1,1)
-                do_scroll_x: False
+                do_scroll_x: True
                 do_scroll_y: True
                 scroll_type: ['bars']
                 bar_width: 10  # Makes scrollbar visible
@@ -120,7 +115,8 @@ ScreenManager:
             id: header
             md_bg_color: app.theme_cls.primary_color
             left_action_items: [["menu", lambda x: nav_drawer.set_state('open')]]
-            title: 'ReportGen'
+            right_action_items: [["help-circle-outline"]]
+            title: 'Classes'
             specific_text_color: 'white'
             elevation: 0
             bold: True
@@ -168,6 +164,7 @@ ScreenManager:
             id: header
             md_bg_color: app.theme_cls.primary_color
             left_action_items: [["menu", lambda x: nav_drawer.set_state('open')]]
+            right_action_items: [["help-circle-outline"]]
             title: 'ReportGen'
             specific_text_color: 'white'
             elevation: 0
@@ -329,6 +326,7 @@ ScreenManager:
             title_color: 1, 1, 1, 1
             md_bg_color: app.theme_cls.primary_color
             left_action_items: [["menu", lambda x: nav_drawer.set_state('open')]]
+            right_action_items: [["help-circle-outline"]]
             specific_text_color: 'white'
             elevation: 0
             bold: True
