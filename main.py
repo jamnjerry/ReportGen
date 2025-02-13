@@ -20,10 +20,10 @@ import configparser
 from docx import Document
 
 conn = connector.connect(
-    host="127.0.0.1",         # Replace with your MySQL server's hostname or IP address
-    user="root",              # Replace with your MySQL username
-    password="Highpeople11",      # Replace with your MySQL password
-    database="gradingrpa",  # Database name
+    host="127.0.0.1",
+    user="root",
+    password="Highpeople11",
+    database="gradingrpa", 
     auth_plugin='mysql_native_password'
 )
 
@@ -99,7 +99,7 @@ class ReportGen(MDApp):
     def sign_in(self, id, password):
         
         if id and password:
-            cursor.execute(f"SELECT * FROM teacher WHERE id={id} AND AES_DECRYPT(password, '{key}') = '{password}' ")
+            cursor.execute('''SELECT * FROM teacher WHERE id= %s AND AES_DECRYPT(password, %s) = %s ''', (id, key, password, ))
             credentials = cursor.fetchall()
             if credentials:
                 self.teacher = credentials[0][0]
@@ -123,29 +123,28 @@ class ReportGen(MDApp):
         if screen == 'courses':
             # self.sm.get_screen('main').ids.mainwelcome.text = f'Hi {self.teacherfname}, here are the subjects\n you are teaching this term...'
             self.sm.get_screen('main').ids.scroll_main.clear_widgets()
-            cursor.execute(f'SELECT name, id, class FROM course where teacher={self.teacher}')
+            cursor.execute('''SELECT name, id, class FROM course where teacher=%s''', (self.teacher,))
             coursedetails = cursor.fetchall()
             print('course', coursedetails)
             details = []
             for course in coursedetails:
                 ide = course[2]
-                cursor.execute(f'SELECT name FROM class where id={ide}')
+                cursor.execute('''SELECT name FROM class where id=%s''', (ide, ))
                 new = course + cursor.fetchall()[0]
                 details.append(new)
             self.sm.get_screen('main').ids.scroll_main.add_widget(self.create_cards(details))
-            # self.data_table.bind(on_row_press=self.course_row_press)
             self.sm.current = 'main'
         elif screen == 'classes':
             self.sm.get_screen('class').ids.scroll_main.clear_widgets()
-            self.data_table = self.create_list('classes', [(item[0], item[1], ' ') for item in self.get_all_items('class', 'teacher', self.teacher)])
-            # self.data_table.bind(on_row_press=self.class_row_press)
+            cursor.execute('''Select * from class where teacher=%s''', (self.teacher,))
+            self.data_table = self.create_list([(item[0], item[1], ' ') for item in cursor.fetchall()])
             self.sm.get_screen('class').ids.scroll_main.add_widget(self.data_table)
             self.sm.current = 'class'
             pass
         self.sm.get_screen('main').ids.nav_drawer.set_state('closed')
         self.sm.get_screen('student').ids.nav_drawer.set_state('closed')
 
-    def create_list(self, column_data, row_data):
+    def create_list(self, row_data):
         """Create an MDList widget."""
         mdlist = MDList()
         for thing in row_data:
@@ -223,40 +222,15 @@ class ReportGen(MDApp):
     def get_all_items(self, table, cond, val):
         cursor.execute(f"SELECT * FROM {table} WHERE {cond}={val}")
         return cursor.fetchall()
-    def get_all_items_cond(self, table, cond1, val1, cond2, val2):
-        cursor.execute(f"SELECT * FROM {table} WHERE {cond1}= '{val1}' AND {cond2}='{val2}'")
-        return cursor.fetchall()
 
-    def switch_to_add_item_screen(self):
-        """Switch to the Add Item screen."""
-        self.sm.current = 'add_item'
 
-    def switch_to_main_screen(self):
-        """Switch to the Main screen."""
-        self.sm.current = 'main'
-
-    def add_item(self, name, quantity, supplier):
-        """Add an item to the inventory."""
-        if not name or not quantity:
-            self.show_dialog("Error", "Both fields are required.")
-            return
-        else:
-            cursor.execute("INSERT INTO items (name, quantity, supplierid) VALUES (%s, %s, %s)", (name, quantity, supplier))
-            conn.commit()
-            self.update_data_table()
-            self.switch_to_main_screen()
-
-    def update_data_table(self):
-        """Update the MDDataTable with the latest inventory data."""
-        self.inventory = self.get_all_items()
-        self.data_table.row_data = [(i + 1, item[1], item[2]) for i, item in enumerate(self.inventory)]
     
     def update_grade(self, termval, studentid, courseid):
         grade = self.dialog.content_cls.ids.term.text.strip()   
 
         if grade:
             print(grade)
-            cursor.execute(f'UPDATE grade SET {termval}={grade} WHERE studentid={studentid} AND courseid={courseid}')
+            cursor.execute('''UPDATE grade SET %s=%s WHERE studentid=%s AND courseid=%s''', (termval, grade, studentid, courseid, ))
             conn.commit()
             
         else:
@@ -265,21 +239,6 @@ class ReportGen(MDApp):
         self.sm.get_screen('student').ids[inputid].text = grade + '%'
         self.dialog.dismiss()
         
-
-    def show_dialog(self, title, text):
-        """Display an error dialog."""
-        dialog = MDDialog(
-            title=title,
-            text=text,
-            buttons=[
-                MDRaisedButton(
-                    text="CLOSE",
-                    on_release=lambda x: dialog.dismiss()
-                ),
-            ],
-        )
-        
-        dialog.open()
     
     def on_card_press(self, id, classname):
         id = id.split(':')[1].strip()
@@ -288,13 +247,14 @@ class ReportGen(MDApp):
         self.screen = self.sm.current_screen
         print(self.screen.name)
         if self.screen.name == 'main':
-            
-            col_input = [('ID', dp(30)), ('Name', dp(50)), ('T1', dp(20)), ('T2', dp(20)), ('T3', dp(20))]
-            cursor.execute(f"SELECT s.id, fname, lname, term1, term2, term3 from gradingrpa.student as s join gradingrpa.course as c on s.class = c.class join gradingrpa.grade as g on c.id = g.courseid WHERE g.courseid = '{id}' and s.class = '{classid}'")
+            cursor.execute('''SELECT s.id, fname, lname, term1, term2, term3
+                            from gradingrpa.student as s join gradingrpa.course as c
+                            on s.class = c.class join gradingrpa.grade as g on c.id = g.courseid
+                            WHERE g.courseid = %s and s.class = %s''', (id, classid))
             grade = cursor.fetchall()
             row_input = [(item[0], item[1] + ' ' + item[2], item[3], item[4], item[5], id) for item in grade]
             print(row_input)
-            table = self.create_list(col_input,row_input)
+            table = self.create_list(row_input)
             self.sm.get_screen(self.sm.current).ids.scroll_main.clear_widgets()
             self.sm.get_screen('course').ids.scroll_course.clear_widgets()
             self.sm.get_screen('course').ids.nav_drawer.set_state('close')
@@ -307,7 +267,9 @@ class ReportGen(MDApp):
         print(id, courseid)
         self.courseid = courseid
         if self.screen.name == 'course':
-            cursor.execute(f"SELECT s.id, fname, lname, term1, term2, term3, s.class FROM gradingrpa.student as s join gradingrpa.grade as g on s.id = g.studentid WHERE s.id= '{id}' AND g.courseid='{courseid}'")
+            cursor.execute('''SELECT s.id, fname, lname, term1, term2, term3, s.class 
+                           FROM gradingrpa.student as s join gradingrpa.grade as g on s.id = g.studentid 
+                           WHERE s.id= %s AND g.courseid=%s''', (id, courseid, ))
             details = cursor.fetchall()
             print(details)
             self.studentid = details[0][0]
@@ -359,14 +321,10 @@ class ReportGen(MDApp):
                 ],
             )
         self.dialog.open()
-    def course_row_press(self, instance_table, instance_row):
-        pass
-    def class_row_press(self, instance_table, instance_row):
-        pass
 
     def generate_reports(self, clas):
-        cursor.execute(f'SELECT * FROM STUDENT WHERE class={clas}')
-        students = [x  for x in cursor.fetchall()]
+        cursor.execute('''SELECT * FROM STUDENT WHERE class=%s''', (clas, ))
+        students = cursor.fetchall()
         for student in students:
             student_id = student[0]
             student_name = student[1] + ' ' + student[2]
@@ -390,13 +348,13 @@ class ReportGen(MDApp):
             hdr_cells[1].text = 'Grade'
 
             print(term)
-            cursor.execute(f'SELECT {term}, courseid FROM grade WHERE studentid={student_id}')
-            courses = [x for x in cursor.fetchall()]
+            cursor.execute(f'''SELECT g.{term}, c.name FROM grade as g join course as c on g.courseid = c.id WHERE studentid=%s''', (student_id, ))
+            courses = cursor.fetchall()
+
             for course in courses:
                 grade = f'{course[0]}'
-                cursor.execute(f'SELECT name FROM course WHERE id={course[1]}')
-                subject = cursor.fetchall()[0][0]
-                print(grade,subject)
+                
+                subject = course[1]
                 
 
                 # Add rows for each subject
@@ -411,6 +369,7 @@ class ReportGen(MDApp):
 
             # Save the document
             doc.save(f'reports/{student_name}_{term}_report_card.docx')
+        self.dialog.dismiss()
 
 
 if __name__ == "__main__":
