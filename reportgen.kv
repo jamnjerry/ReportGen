@@ -171,123 +171,136 @@ ScreenManager:
             bold: True
         MDGridLayout:
             rows: 2
-            MDFloatLayout:
-                Image:
-                    source: 'photos/johndoe.png'
-                    pos_hint: {"center_x": 0.5, "center_y": 0.6}
-                MDLabel:
-                    id: studentname
-                    halign: 'center'
-                    pos_hint: {"center_y": 0.3}
-                    bold: True
-                    theme_text_color: 'Custom'
-                    text_color: 0,0,0,0.8
-                    font_size: "30sp"
-                MDLabel:
-                    id: classid
-                    halign: 'center'
-                    pos_hint: {"center_y": 0.2}
-                    bold: True
-                    theme_text_color: 'Custom'
-                    text_color: 0,0,0,0.8
-                    font_size: "20sp"
-            MDGridLayout:
-                rows: 3
-                MDBoxLayout:
-                    orientation: 'horizontal'
+            MDBoxLayout:
+                orientation: 'vertical'
+                # size_hint_y: None
+                # height: self.minimum_height
+                spacing: "30dp"
+                padding: "30dp"
+                MDFloatLayout:
+                    Image:
+                        source: 'photos/johndoe.png'
+                        size_hint_y: None  # Prevents collapsing
+                        height: 200 
+                        pos_hint: {"center_x": 0.5, "center_y": 0.9}
                     MDLabel:
-                        text: 'Term 1'
-                        halign: 'right'
+                        id: studentname
+                        halign: 'center'
+                        pos_hint: {"center_x": 0.5, "center_y": 0.55}
                         bold: True
                         theme_text_color: 'Custom'
-                        text_color: app.theme_cls.primary_color
+                        text_color: 0,0,0,0.8
+                        font_size: "30sp"
+                    MDLabel:
+                        id: classid
+                        halign: 'center'
+                        pos_hint: {"center_x": 0.5, "center_y": 0.45}
+                        bold: True
+                        theme_text_color: 'Custom'
+                        text_color: 0,0,0,0.8
                         font_size: "20sp"
+            MDGridLayout:
+                cols: 3
+                MDBoxLayout:
+                    orientation: 'vertical'
+                    
+                    MDFloatLayout:
+                        MDLabel:
+                            text: 'Term 1'
+                            size_hint_x: 1
+                            pos_hint: {"center_x": 0.5, "center_y": 1}
+                            halign: 'center'
+                            bold: True
+                            font_size: "40sp"
                     MDFloatLayout:
                         pos_hint: {"center_x": 0.5, "center_y": 0.5}
                         MDCard:
                             size_hint: None, None
-                            size: 100, 100
-                            radius: [100, 100, 100, 100]  # Makes it a perfect circle
+                            size: 250, 250
+                            radius: [250, 250, 250, 250]  # Makes it a perfect circle
                             elevation: 0
                             fit_image: True
                             md_bg_color: app.theme_cls.primary_color
-                            pos_hint: {'center_x': 0.5, 'center_y':0.5}
+                            pos_hint: {'center_x': 0.5, 'center_y':0.75}
                             MDLabel:
                                 id: t1
                                 halign: 'center'
                                 theme_text_color: 'Custom'
                                 text_color: 1,1,1,1
                                 bold: True
-                    MDBoxLayout:
+                                font_size: "40sp"
+                    MDFloatLayout:
                         MDRectangleFlatButton:
                             id: t1btn
                             text: 'Edit'
-                            pos_hint: {'center_y': 0.5}
+                            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
                             on_release: app.edit_grade('Term 1', 'term1')
                 MDBoxLayout:
-                    orientation: "horizontal"
-                    MDLabel:
-                        text: 'Term 2'
-                        size_hint_x: 1
-                        halign: 'right'
-                        bold: True
-                        theme_text_color: 'Custom'
-                        text_color: app.theme_cls.primary_color
-                        font_size: "20sp"
+                    orientation: "vertical"
+                    MDFloatLayout:
+                        MDLabel:
+                            text: 'Term 2'
+                            size_hint_x: 1
+                            pos_hint: {"center_x": 0.5, "center_y": 1}
+                            halign: 'center'
+                            bold: True
+                            font_size: "40sp"
                     MDFloatLayout:
                         pos_hint: {"center_x": 0.5, "center_y": 0.5}
                         MDCard:
                             size_hint: None, None
-                            size: 100, 100
-                            radius: [100, 100, 100, 100]  # Makes it a perfect circle
+                            size: 250, 250
+                            radius: [250, 250, 250, 250]  # Makes it a perfect circle
                             elevation: 0
                             fit_image: True
                             md_bg_color: app.theme_cls.primary_color
-                            pos_hint: {'center_x': 0.5, 'center_y':0.5}
+                            pos_hint: {'center_x': 0.5, 'center_y':0.75}
                             MDLabel:
                                 id: t2
                                 halign: 'center'
                                 theme_text_color: 'Custom'
                                 text_color: 1,1,1,1
+                                font_size: "40sp"
                                 bold: True
-                    MDBoxLayout:
+                    MDFloatLayout:
                         MDRectangleFlatButton:
                             id: t2btn
                             text: 'Edit'
-                            pos_hint: {'center_y': 0.5}
+                            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
                             on_release: app.edit_grade('Term 2', 'term2')
                 MDBoxLayout:
-                    orientation: "horizontal"
-                    MDLabel:
-                        text: 'Term 3'
-                        size_hint_x: 1
-                        halign: 'right'
-                        bold: True
-                        theme_text_color: 'Custom'
-                        text_color: app.theme_cls.primary_color
-                        font_size: "20sp"
+                    orientation: "vertical"
+                    MDFloatLayout:
+                        MDLabel:
+                            text: 'Term 3'
+                            size_hint_x: 1
+                            pos_hint: {"center_x": 0.5, "center_y": 1}
+                            halign: 'center'
+                            bold: True
+                            font_size: "40sp"
                     MDFloatLayout:
                         pos_hint: {"center_x": 0.5, "center_y": 0.5}
                         MDCard:
                             size_hint: None, None
-                            size: 100, 100
-                            radius: [100, 100, 100, 100]  # Makes it a perfect circle
+                            size: 250, 250
+                            radius: [250, 250, 250, 250]  # Makes it a perfect circle
                             elevation: 0
                             fit_image: True
                             md_bg_color: app.theme_cls.primary_color
-                            pos_hint: {'center_x': 0.5, 'center_y':0.5}
+                            pos_hint: {'center_x': 0.5, 'center_y':0.75}
                             MDLabel:
                                 id: t3
                                 halign: 'center'
                                 theme_text_color: 'Custom'
                                 text_color: 1,1,1,1
+                                font_size: "40sp"
                                 bold: True
-                    MDBoxLayout:
+                    MDFloatLayout:
                         MDRectangleFlatButton:
                             id: t3btn
-                            size_hint_x: None
-                            width: 50  # Set a fixed width
-                            pos_hint: {"center_y": 0.5}
+                            size_hint: None, None  # Disables auto-scaling
+                            size: 400, 100 
+                            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
                             text: 'Edit'
                             on_release: app.edit_grade('Term 3', 'term3')
     MDNavigationDrawer:

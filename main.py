@@ -1,6 +1,6 @@
 from kivy.lang import Builder
 from kivy.properties import StringProperty, NumericProperty
-from kivy.uix.screenmanager import Screen, ScreenManager, FadeTransition
+from kivy.uix.screenmanager import Screen
 from kivymd.app import MDApp
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.button import MDIconButton
@@ -8,9 +8,7 @@ from kivymd.uix.card import MDCard
 from kivymd.uix.label import MDLabel
 from kivymd.uix.relativelayout import MDRelativeLayout
 from kivymd.uix.gridlayout import MDGridLayout
-from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.list import MDList, ThreeLineIconListItem, IconLeftWidget, OneLineIconListItem
-from kivymd.uix.card import MDSeparator
 from kivy.metrics import dp
 from kivymd.uix.fitimage import FitImage
 from kivymd.uix.dialog import MDDialog
@@ -230,7 +228,7 @@ class ReportGen(MDApp):
 
         if grade:
             print(grade)
-            cursor.execute('''UPDATE grade SET %s=%s WHERE studentid=%s AND courseid=%s''', (termval, grade, studentid, courseid, ))
+            cursor.execute(f'''UPDATE grade SET {termval}=%s WHERE studentid=%s AND courseid=%s''', (grade, studentid, courseid, ))
             conn.commit()
             
         else:
